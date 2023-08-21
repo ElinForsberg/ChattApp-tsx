@@ -1,11 +1,14 @@
 
-import { useSocket } from './socketContext'
+import { useState } from 'react';
+import { useSocket } from './SocketContext'
 
 
 
 function Chat() {
-    const {room, setRoom, currentMessage, joinRoom, messageList, username, setCurrentMessage, sendMessage} = useSocket()
+    const {room, setRoom, currentMessage, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom} = useSocket()
    
+
+
     return (
       <div className="chat-window">
         <div className="chat-header">
@@ -13,9 +16,9 @@ function Chat() {
         </div>
         <div className="chat-body">
           <div className="message-container">
-            {messageList.map((messageContent) => {
+            {messageList.map((messageContent,index) => {
               return (
-                <div
+                <div key={index}
                   className="message"
                   id={username === messageContent.author ? "you" : "other"}
                 >
@@ -58,7 +61,7 @@ function Chat() {
         </div>
         <div>
        
-    <input value={room} onChange={(e) => setRoom(e.target.value)} type ="text"/>
+    <input value={currentRoom} onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
      <button onClick={joinRoom}>Skapa rum</button>
                
                

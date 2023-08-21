@@ -19,7 +19,14 @@ io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
+        //här lämna de rum som är med i redan
+        
+       
+            socket.leave(room)
+        
+        
         socket.join(room);
+        console.log(socket.rooms);
         console.log(io.sockets.adapter.rooms);
     })
 
