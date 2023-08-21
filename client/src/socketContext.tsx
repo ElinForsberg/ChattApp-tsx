@@ -8,7 +8,23 @@ interface ISocketContext {
     room: string
     setRoom: React.Dispatch<React.SetStateAction<string>>
     login: () => void
+    joinRoom: () => void
+    currentMessage: string
+    setCurrentMessage:  React.Dispatch<React.SetStateAction<string>>
+    messageList: messageData[]
+    setMessageList: React.Dispatch<React.SetStateAction<messageData[]>>
+    sendMessage: () => void
 }
+
+interface messageData {
+        room: any;
+        author: any;
+        message: string;
+        time: string;
+    }
+  
+  
+  
 
 const defaultValues = {
     username:"",
@@ -16,7 +32,13 @@ const defaultValues = {
     room:"",
     setRoom: () => {},
     isLoggedIn: false,
-    login: () => {}
+    login: () => {},
+    joinRoom: () => {},
+    currentMessage: "",
+    setCurrentMessage: () => {},
+    messageList: [],
+    setMessageList: () => {[]},
+    sendMessage: () => {}
 
     
 }
@@ -30,7 +52,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [username, setUsername] = useState<string>("");
     const [room, setRoom] = useState("");
+    const [currentMessage, setCurrentMessage] = useState("");
+    const [messageList, setMessageList] = useState<messageData[]>([]);
+    
+    // const [showChat, setShowChat] = useState(false);
 
+    
+    
     useEffect(() => {
         if(room){
             socket.emit("join_room", room)
@@ -42,10 +70,47 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         socket.connect()
         setIsLoggedIn(true)
         setRoom("lobby")
+        console.log(username);
+        
     }
 
+    const joinRoom = () => {
+        if ( room !== "") {
+      
+            socket.emit("join_room", room, username);
+            
+            // setShowChat(true);
+            console.log(room);
+          }
+    }
+
+    const sendMessage = async () => {
+        if (currentMessage !== "") {
+          const messageData = {
+            room: room,
+            author: username,
+            message: currentMessage,
+            time:
+              new Date(Date.now()).getHours() +
+              ":" +
+              new Date(Date.now()).getMinutes(),
+          };
+    
+          await socket.emit("send_message", messageData);
+          setMessageList((list) => [...list, messageData]);
+          setCurrentMessage("");
+        }
+      };
+
+      useEffect(() => {
+        socket.on("receive_message", (data) => {
+          setMessageList((list) => [...list, data]);
+        });
+      }, [socket]);
+    
+
     return (
-        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom}}>
+        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage}}>
             {children}
         </SocketContext.Provider>
     

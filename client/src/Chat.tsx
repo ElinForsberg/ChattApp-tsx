@@ -4,11 +4,14 @@ import { useSocket } from './SocketContext'
 
 
 function Chat() {
-    const {setRoom} = useSocket()
+    const {room, setRoom} = useSocket()
+    const {joinRoom} = useSocket()
   return (
     <div>
-        <button onClick={() => setRoom("123")}>Joina rum 123</button>
-        <button onClick={() => setRoom("456")}>Joina rum 456</button>
+       
+        <input value={room} onChange={(e) => setRoom(e.target.value)} type ="text"/>
+        <button onClick={joinRoom}>Skapa rum</button>
+        
         
     </div>
   )

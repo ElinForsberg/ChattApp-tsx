@@ -24,5 +24,10 @@ io.on("connection", (socket) => {
     })
 })
 
+socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+    console.log(data);
+  });
+
 server.listen(3000, () => console.log("Server is up and running"));
 
