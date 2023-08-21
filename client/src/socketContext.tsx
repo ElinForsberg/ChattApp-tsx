@@ -17,8 +17,8 @@ interface ISocketContext {
 }
 
 interface messageData {
-        room: any;
-        author: any;
+        room:  string;
+        author:  string;
         message: string;
         time: string;
     }

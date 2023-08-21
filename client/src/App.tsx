@@ -1,6 +1,7 @@
 import Chat from "./Chat"
-import { useSocket } from "./SocketContext"
-import Login from "./login"
+import { useSocket } from "./socketContext"
+import Login from "./Login"
+import "./app.css"
 
 
 
