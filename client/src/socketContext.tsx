@@ -79,15 +79,28 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         
     }
 
-    const joinRoom = () => {
-        if ( room !== "") {
-            setRoom(currentRoom);
-            socket.emit("join_room", room, username);
+    // const joinRoom = () => {
+    //     if ( room !== "") {
+    //         setRoom(currentRoom);
+    //         socket.emit("join_room", room, username);
             
-            // setShowChat(true);
-            console.log(room);
-          }
-    }
+    //         // setShowChat(true);
+    //         console.log(room);
+    //       }
+    // }
+    const joinRoom = () => {
+      if ( room !== "") {
+          setRoom(currentRoom);
+          socket.emit("leave_room");
+          socket.emit("join_room", room, username);
+          
+          setMessageList([]);
+          
+          // setShowChat(true);
+          console.log(room);
+        }
+  }
+  
 
     const sendMessage = async () => {
         if (currentMessage !== "") {
