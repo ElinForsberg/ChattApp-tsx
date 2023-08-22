@@ -5,7 +5,7 @@ import { useSocket } from './socketContext'
 
 
 function Chat() {
-    const {room, currentMessage,setRoom, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom, roomsList} = useSocket()
+    const {leaveRoom,room, currentMessage,setRoom, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom, roomsList} = useSocket()
    
   
 
@@ -50,8 +50,11 @@ function Chat() {
           />
           <button onClick={sendMessage}>&#9658;</button>
         </div>
-        <div>
-          <p>Du är i rum: {room}</p>
+
+        <div className='sidebar'>
+        <p>Du är inloggad som: {username}</p><br />
+        <p>Du är i rum: {room}</p><br />
+        <button onClick={leaveRoom}>Lämna rum:{room}</button> <br />
           <p>Alla aktiva rum: </p>
           <ul>
             {roomsList.map((activeRoom) => (
@@ -72,17 +75,5 @@ function Chat() {
       </div>
     );
   }
-
-//   return (
-
-//     <div>
-       
-//         <input value={room} onChange={(e) => setRoom(e.target.value)} type ="text"/>
-//         <button onClick={joinRoom}>Skapa rum</button>
-        
-        
-//     </div>
-//   )
-// }
 
 export default Chat
