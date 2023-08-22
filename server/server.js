@@ -14,6 +14,7 @@ const io = new Server(server, {
 app.use(cors());
 
 //här kan man göra en variabel som tar in lista på alla rum. om rummet redan finns, lägg inte till annars lägg till. bygg logik för detta
+const activeRooms = [];
 
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
@@ -26,8 +27,15 @@ io.on("connection", (socket) => {
           }
           
           socket.join(room);
-          socket.currentRoom = room; // Store the current room
+          socket.currentRoom = room; 
+          // Store the current room
+          if (!activeRooms.includes(room)) {
+            activeRooms.push(room);
+          }
+          io.sockets.emit('activeRooms', activeRooms);
+          
           console.log(io.sockets.adapter.rooms);
+          console.log("active rooms: ", activeRooms);
     })
 
 
@@ -43,6 +51,8 @@ socket.on("send_message", (data) => {
       socket.currentRoom = null;
     }
 });
+    
+
 });
 
 

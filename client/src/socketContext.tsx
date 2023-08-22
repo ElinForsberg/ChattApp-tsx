@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react"
+import { PropsWithChildren, SetStateAction, createContext, useContext, useEffect, useState } from "react"
 import {io} from "socket.io-client"
 
 interface ISocketContext {
@@ -16,6 +16,9 @@ interface ISocketContext {
     sendMessage: () => void
     currentRoom: string
     setCurrentRoom: React.Dispatch<React.SetStateAction<string>>
+    roomsList: string[];
+    setRoomsList: React.Dispatch<React.SetStateAction<string[]>>
+    
 }
 
 interface messageData {
@@ -42,7 +45,10 @@ const defaultValues = {
     setMessageList: () => {[]},
     sendMessage: () => {},
     currentRoom: "",
-    setCurrentRoom: () => {}
+    setCurrentRoom: () => {},
+    roomsList: [],
+    setRoomsList: () => []
+    
 
     
 }
@@ -59,6 +65,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [currentMessage, setCurrentMessage] = useState("");
     const [messageList, setMessageList] = useState<messageData[]>([]);
     const [currentRoom, setCurrentRoom] = useState("");
+    const [roomsList, setRoomsList] = useState<string[]>([]);
     
     // const [showChat, setShowChat] = useState(false);
 
@@ -78,7 +85,18 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         console.log(username);
         
     }
+    useEffect(() => {
+      socket.on('activeRooms', function (activeRooms) {
+        // Handle the received activeRooms array
+        // console.log("Received active rooms:", activeRooms);
+        setRoomsList(activeRooms)
+        
+      })
+    }, [])
 
+   
+    
+    
     // const joinRoom = () => {
     //     if ( room !== "") {
     //         setRoom(currentRoom);
@@ -100,6 +118,10 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           console.log(room);
         }
   }
+  
+    
+    // You can update the UI or perform any other actions with the activeRooms array
+  
   
 
     const sendMessage = async () => {
@@ -128,7 +150,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
 
     return (
-        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage, currentRoom, setCurrentRoom}}>
+        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage, currentRoom, setCurrentRoom, roomsList, setRoomsList}}>
             {children}
         </SocketContext.Provider>
     
