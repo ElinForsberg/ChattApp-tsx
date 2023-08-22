@@ -19,8 +19,15 @@ io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
-        socket.join(room);
-        console.log(io.sockets.adapter.rooms);
+        //här lämna de rum som är med i redan
+        if (socket.currentRoom) {
+            socket.leave(socket.currentRoom);
+            console.log(`User left room: ${socket.currentRoom}`);
+          }
+          
+          socket.join(room);
+          socket.currentRoom = room; // Store the current room
+          console.log(io.sockets.adapter.rooms);
     })
 
 
@@ -28,6 +35,17 @@ socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
-})
+
+  socket.on("leave_room", () => {
+    if (socket.currentRoom) {
+      socket.leave(socket.currentRoom);
+      console.log(`User left room: ${socket.currentRoom}`);
+      socket.currentRoom = null;
+    }
+});
+});
+
+
+
 server.listen(3000, () => console.log("Server is up and running"));
 

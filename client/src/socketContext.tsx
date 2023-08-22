@@ -14,6 +14,8 @@ interface ISocketContext {
     messageList: messageData[]
     setMessageList: React.Dispatch<React.SetStateAction<messageData[]>>
     sendMessage: () => void
+    currentRoom: string
+    setCurrentRoom: React.Dispatch<React.SetStateAction<string>>
 }
 
 interface messageData {
@@ -38,7 +40,9 @@ const defaultValues = {
     setCurrentMessage: () => {},
     messageList: [],
     setMessageList: () => {[]},
-    sendMessage: () => {}
+    sendMessage: () => {},
+    currentRoom: "",
+    setCurrentRoom: () => {}
 
     
 }
@@ -54,6 +58,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [room, setRoom] = useState("");
     const [currentMessage, setCurrentMessage] = useState("");
     const [messageList, setMessageList] = useState<messageData[]>([]);
+    const [currentRoom, setCurrentRoom] = useState("");
     
     // const [showChat, setShowChat] = useState(false);
 
@@ -74,15 +79,28 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         
     }
 
-    const joinRoom = () => {
-        if ( room !== "") {
-      
-            socket.emit("join_room", room, username);
+    // const joinRoom = () => {
+    //     if ( room !== "") {
+    //         setRoom(currentRoom);
+    //         socket.emit("join_room", room, username);
             
-            // setShowChat(true);
-            console.log(room);
-          }
-    }
+    //         // setShowChat(true);
+    //         console.log(room);
+    //       }
+    // }
+    const joinRoom = () => {
+      if ( room !== "") {
+          setRoom(currentRoom);
+          socket.emit("leave_room");
+          socket.emit("join_room", room, username);
+          
+          setMessageList([]);
+          
+          // setShowChat(true);
+          console.log(room);
+        }
+  }
+  
 
     const sendMessage = async () => {
         if (currentMessage !== "") {
@@ -110,7 +128,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
 
     return (
-        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage}}>
+        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage, currentRoom, setCurrentRoom}}>
             {children}
         </SocketContext.Provider>
     
