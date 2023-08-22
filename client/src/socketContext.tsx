@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react"
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import {io} from "socket.io-client"
 
 interface ISocketContext {
@@ -16,6 +16,9 @@ interface ISocketContext {
     sendMessage: () => void
     currentRoom: string
     setCurrentRoom: React.Dispatch<React.SetStateAction<string>>
+    typingUsers: string[], // Added typingUsers to the context value
+    isTyping: boolean, // Added isTyping to the context value
+    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface messageData {
@@ -42,15 +45,19 @@ const defaultValues = {
     setMessageList: () => {[]},
     sendMessage: () => {},
     currentRoom: "",
-    setCurrentRoom: () => {}
+    setCurrentRoom: () => {},
+    typingUsers: [], // Initialize as an empty array
+    isTyping: false,  // Added isTyping to the context value
+    handleInput: () => {},
 
     
 }
 
-const SocketContext = createContext<ISocketContext>(defaultValues)
-export const useSocket = () => useContext(SocketContext)
+const SocketContext = createContext<ISocketContext>(defaultValues);
 
-const socket =io("http://localhost:3000", {autoConnect: false})
+export const useSocket = () => useContext(SocketContext);
+
+const socket = io("http://localhost:3000", { autoConnect: false });
 
 const SocketProvider = ({children}: PropsWithChildren) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -59,9 +66,22 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [currentMessage, setCurrentMessage] = useState("");
     const [messageList, setMessageList] = useState<messageData[]>([]);
     const [currentRoom, setCurrentRoom] = useState("");
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const [isTyping, setIsTyping] = useState(false);
     
     // const [showChat, setShowChat] = useState(false);
 
+    
+      const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputMessage = event.target.value;
+        setCurrentMessage(inputMessage);
+    
+        if (inputMessage.trim() !== "") {
+          socket.emit("typing", username);
+        } else {
+          socket.emit("not_typing", username);
+        }
+      };
     
     
     useEffect(() => {
@@ -111,11 +131,54 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         socket.on("receive_message", (data) => {
           setMessageList((list) => [...list, data]);
         });
-      }, [socket]);
+      }, []);
+      useEffect(() => {
+        const handleTyping = (username: string) => {
+          if (!typingUsers.includes(username)) {
+            setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
+          }
+          setIsTyping(true);
+        };
     
+        const handleNotTyping = (username: string) => {
+          setTypingUsers((prevTypingUsers) =>
+            prevTypingUsers.filter((user) => user !== username)
+          );
+          if (typingUsers.length === 0) {
+            setIsTyping(false);
+          }
+        };
+    
+        socket.on("typing", handleTyping);
+        socket.on("not_typing", handleNotTyping);
+       
+    
+        return () => {
+          socket.off("typing", handleTyping);
+          socket.off("not_typing", handleNotTyping);
+        };
+      }, [typingUsers]);
 
     return (
-        <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage, currentRoom, setCurrentRoom}}>
+        <SocketContext.Provider value={{username, 
+        isLoggedIn, 
+        login,
+        setUsername, 
+        room, 
+        setRoom, 
+        joinRoom, 
+        currentMessage, 
+        setCurrentMessage, 
+        messageList, 
+        setMessageList, 
+        sendMessage, 
+        currentRoom, 
+        setCurrentRoom,
+        typingUsers, // Added typingUsers to the context value
+        isTyping, // Added isTyping to the context value
+        handleInput
+
+        }}>
             {children}
         </SocketContext.Provider>
     

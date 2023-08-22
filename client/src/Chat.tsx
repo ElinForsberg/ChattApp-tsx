@@ -1,11 +1,11 @@
 
-import { useState } from 'react';
-import { useSocket } from './SocketContext'
+
+import { useSocket } from './socketContext'
 
 
 
 function Chat() {
-    const {room, setRoom, currentMessage, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom} = useSocket()
+    const {room, currentMessage, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom, isTyping, typingUsers} = useSocket()
    
 
 
@@ -16,12 +16,22 @@ function Chat() {
         </div>
         <div className="chat-body">
           <div className="message-container">
+
             {messageList.map((messageContent,index) => {
               return (
                 <div key={index}
                   className="message"
                   id={username === messageContent.author ? "you" : "other"}
-                >
+                >               
+                    <div className="feedback">
+                {isTyping && (
+                  <p>
+                    {typingUsers.join(", ")}{" "}
+                    {typingUsers.length === 1 ? "is" : "are"} typing now...
+                  </p>
+                )}
+              </div>
+                  
                   <div>
                     <div className="message-content">
                       <p>{messageContent.message}</p>

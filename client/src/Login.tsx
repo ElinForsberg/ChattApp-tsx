@@ -1,5 +1,5 @@
 
-import { useSocket } from './SocketContext'
+import { useSocket } from './socketContext'
 
 function Login() {
     const {login, username, setUsername} = useSocket()

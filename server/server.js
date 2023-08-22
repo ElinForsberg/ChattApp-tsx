@@ -19,13 +19,16 @@ io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
-        //här lämna de rum som är med i redan
-        
-       
-            socket.leave(room)
-        
+        //här lämna de rum som är med i redan  
+
+        const rooms = socket.rooms;
+
+        socket.leaveAll(rooms, function(err){
+          
+        })
         
         socket.join(room);
+      
         console.log(socket.rooms);
         console.log(io.sockets.adapter.rooms);
     })
@@ -35,6 +38,15 @@ socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
+
+  socket.on("typing", (username) => {
+    socket.broadcast.emit("typing", username);
+  });
+  
+  socket.on("not_typing", (username) => {
+    socket.broadcast.emit("not_typing", username);
+  });
+  
 })
 server.listen(3000, () => console.log("Server is up and running"));
 
