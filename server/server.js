@@ -14,7 +14,7 @@ const io = new Server(server, {
 app.use(cors());
 
 //här kan man göra en variabel som tar in lista på alla rum. om rummet redan finns, lägg inte till annars lägg till. bygg logik för detta
-const activeRooms = [];
+let activeRooms = [];
 
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
             activeRooms.push(room);
           }
           io.sockets.emit('activeRooms', activeRooms);
-          
+
           console.log(io.sockets.adapter.rooms);
           console.log("active rooms: ", activeRooms);
     })
@@ -44,16 +44,36 @@ socket.on("send_message", (data) => {
     console.log(data);
   });
 
+  
+
   socket.on("leave_room", () => {
     if (socket.currentRoom) {
       socket.leave(socket.currentRoom);
       console.log(`User left room: ${socket.currentRoom}`);
       socket.currentRoom = null;
+      
     }
 });
-    
 
+socket.on("disconnect", () => {
+
+    activeRooms = activeRooms.filter((room) => {
+
+      return activeRooms.get(room)?.size > 0; // Ta bort rummet från listan om ingen är kvar i det
+
+    });
+
+    io.emit("active_rooms", activeRooms); // Skickar lista på aktiva rum till alla
+
+    console.log("User Disconnected", socket.id);
+    console.log("active rooms after disconnect: ", activeRooms);
+
+  });
+
+   
 });
+
+
 
 
 
