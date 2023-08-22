@@ -1,4 +1,4 @@
-import { PropsWithChildren, SetStateAction, createContext, useContext, useEffect, useState } from "react"
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react"
 import {io} from "socket.io-client"
 
 interface ISocketContext {
@@ -18,7 +18,6 @@ interface ISocketContext {
     setCurrentRoom: React.Dispatch<React.SetStateAction<string>>
     roomsList: string[];
     setRoomsList: React.Dispatch<React.SetStateAction<string[]>>
-    
 }
 
 interface messageData {
@@ -28,10 +27,7 @@ interface messageData {
         time: string;
     }
   
-  
-  
-
-const defaultValues = {
+    const defaultValues = {
     username:"",
     setUsername: () => {},
     room:"",
@@ -47,10 +43,7 @@ const defaultValues = {
     currentRoom: "",
     setCurrentRoom: () => {},
     roomsList: [],
-    setRoomsList: () => []
-    
-
-    
+    setRoomsList: () => []  
 }
 
 const SocketContext = createContext<ISocketContext>(defaultValues)
@@ -66,11 +59,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [messageList, setMessageList] = useState<messageData[]>([]);
     const [currentRoom, setCurrentRoom] = useState("");
     const [roomsList, setRoomsList] = useState<string[]>([]);
-    
-    // const [showChat, setShowChat] = useState(false);
-
-    
-    
+  
     useEffect(() => {
         if(room){
             socket.emit("join_room", room)
@@ -87,43 +76,21 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     }
     useEffect(() => {
       socket.on('activeRooms', function (activeRooms) {
-        // Handle the received activeRooms array
-        // console.log("Received active rooms:", activeRooms);
-        setRoomsList(activeRooms)
-        
-      })
-    }, [])
-
-   
+        setRoomsList(activeRooms);
+      });
+    }, []);
     
-    
-    // const joinRoom = () => {
-    //     if ( room !== "") {
-    //         setRoom(currentRoom);
-    //         socket.emit("join_room", room, username);
-            
-    //         // setShowChat(true);
-    //         console.log(room);
-    //       }
-    // }
-    const joinRoom = () => {
-      if ( room !== "") {
-          setRoom(currentRoom);
-          socket.emit("leave_room");
-          socket.emit("join_room", room, username);
-          
-          setMessageList([]);
-          
-          // setShowChat(true);
-          console.log(room);
+    const joinRoom = () => {  
+      if (room !== "") {
+        if (currentRoom !== "") {
+          socket.emit("leave_room"); //"leave_room" innan man går med i ett nytt rum
         }
-  }
-  
+        setRoom(currentRoom);
+        socket.emit("join_room", currentRoom, username);
+        setMessageList([]);
+      }
+    };
     
-    // You can update the UI or perform any other actions with the activeRooms array
-  
-  
-
     const sendMessage = async () => {
         if (currentMessage !== "") {
           const messageData = {
@@ -148,15 +115,11 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         });
       }, [socket]);
     
-
     return (
         <SocketContext.Provider value={{username, isLoggedIn, login, setUsername, room, setRoom, joinRoom, currentMessage, setCurrentMessage, messageList, setMessageList, sendMessage, currentRoom, setCurrentRoom, roomsList, setRoomsList}}>
             {children}
         </SocketContext.Provider>
-    
     )
-   
     }     
-
 
     export default SocketProvider

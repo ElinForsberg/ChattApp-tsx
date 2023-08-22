@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -13,14 +12,12 @@ const io = new Server(server, {
 
 app.use(cors());
 
-//här kan man göra en variabel som tar in lista på alla rum. om rummet redan finns, lägg inte till annars lägg till. bygg logik för detta
 let activeRooms = [];
 
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
-        //här lämna de rum som är med i redan
         if (socket.currentRoom) {
             socket.leave(socket.currentRoom);
             console.log(`User left room: ${socket.currentRoom}`);
@@ -28,7 +25,6 @@ io.on("connection", (socket) => {
           
           socket.join(room);
           socket.currentRoom = room; 
-          // Store the current room
           if (!activeRooms.includes(room)) {
             activeRooms.push(room);
           }
@@ -38,44 +34,34 @@ io.on("connection", (socket) => {
           console.log("active rooms: ", activeRooms);
     })
 
-
 socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
 
-  
-
   socket.on("leave_room", () => {
-    if (socket.currentRoom) {
-      socket.leave(socket.currentRoom);
+    if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
+      socket.leave(socket.currentRoom); //
       console.log(`User left room: ${socket.currentRoom}`);
+      const index = activeRooms.indexOf(socket.currentRoom);
+      if (index !== -1) {
+        activeRooms.splice(index, 1); // Ta bort rummet från activeRooms
+      }
+      io.sockets.emit('activeRooms', activeRooms); // Uppdaterade listan över activeRooms
       socket.currentRoom = null;
-      
     }
-});
-
-socket.on("disconnect", () => {
-
-    activeRooms = activeRooms.filter((room) => {
-
-      return activeRooms.get(room)?.size > 0; // Ta bort rummet från listan om ingen är kvar i det
-
-    });
-
-    io.emit("active_rooms", activeRooms); // Skickar lista på aktiva rum till alla
-
-    console.log("User Disconnected", socket.id);
-    console.log("active rooms after disconnect: ", activeRooms);
-
   });
 
-   
+  socket.on("disconnect", () => {
+    activeRooms = activeRooms.filter((room) => {
+      return io.sockets.adapter.rooms.get(room)?.size > 0;
+    });
+    io.sockets.emit("activeRooms", activeRooms);
+    console.log("User Disconnected", socket.id);
+    console.log("active rooms after disconnect: ", activeRooms);
+  });
+  
 });
-
-
-
-
 
 server.listen(3000, () => console.log("Server is up and running"));
 
