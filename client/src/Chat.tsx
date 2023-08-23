@@ -1,20 +1,27 @@
-
-
 import { useSocket } from './socketContext'
 
-
-
 function Chat() {
-    const {room, currentMessage,setRoom, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom, roomsList} = useSocket()
-   
-  
-
+  const {leaveRoom,
+    room, 
+    currentMessage,
+    setRoom, 
+    joinRoom, 
+    messageList, 
+    username, 
+    setCurrentMessage, 
+    sendMessage, 
+    setCurrentRoom, 
+    roomsList} = useSocket()
+    
     return (
-      <div className="chat-window">
-        <div className="chat-header">
-          <p>Live Chat</p>
+    <div className="chat-window">
+
+      <div className="chat-header">
+        <p>Live Chat</p>
         </div>
+        
         <div className="chat-body">
+          
           <div className="message-container">
             {messageList.map((messageContent,index) => {
               return (
@@ -36,6 +43,7 @@ function Chat() {
             })}
           </div>
         </div>
+
         <div className="chat-footer">
           <input
             type="text"
@@ -50,9 +58,12 @@ function Chat() {
           />
           <button onClick={sendMessage}>&#9658;</button>
         </div>
-        <div>
-          <p>Du är i rum: {room}</p>
-          <p>Alla aktiva rum: </p>
+
+        <div className='sidebar'>
+        <p>Du är inloggad som: {username}</p><br />
+        <p>Du är i rum: {room}</p><br />
+        <button onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
+        <p>Alla aktiva rum: </p>
           <ul>
             {roomsList.map((activeRoom) => (
               <li key={activeRoom} value={activeRoom} onClick={() => setRoom(activeRoom)}>
@@ -63,26 +74,12 @@ function Chat() {
         </div>
         <div>
        
-    <input value={currentRoom} onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
-     <button onClick={joinRoom}>Skapa rum</button>
-               
-               
-     </div>
+    <input onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
+    <button onClick={joinRoom}>Skapa rum</button>
 
-      </div>
-    );
-  }
-
-//   return (
-
-//     <div>
-       
-//         <input value={room} onChange={(e) => setRoom(e.target.value)} type ="text"/>
-//         <button onClick={joinRoom}>Skapa rum</button>
-        
-        
-//     </div>
-//   )
-// }
+  </div>
+</div>
+);
+}
 
 export default Chat
