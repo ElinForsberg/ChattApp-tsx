@@ -52,15 +52,37 @@ socket.on("send_message", (data) => {
     }
   });
 
+  // socket.on("disconnect", () => {
+  //   activeRooms = activeRooms.filter((room) => {
+  //     return io.sockets.adapter.rooms.get(room)?.size > 0;
+  //   });
+  //   io.sockets.emit("activeRooms", activeRooms);
+  //   console.log("User Disconnected", socket.id);
+  //   console.log("active rooms after disconnect: ", activeRooms);
+  // });
+  
   socket.on("disconnect", () => {
-    activeRooms = activeRooms.filter((room) => {
-      return io.sockets.adapter.rooms.get(room)?.size > 0;
+    // Ta bort användarens socket från rummet
+    socket.leave("lobby");
+  
+    // Uppdatera listan över aktiva rum och inkludera alltid "lobby"
+    activeRooms = Array.from(new Set([...activeRooms, "lobby"]));
+  
+    // Filtrera bort tomma rum från listan (utom "lobby")
+    activeRooms = activeRooms.filter(room => {
+      if (room === "lobby") {
+        return true; // Behåll alltid "lobby"
+      }
+      const roomSize = io.sockets.adapter.rooms.get(room)?.size;
+      return roomSize && roomSize > 0;
     });
+  
     io.sockets.emit("activeRooms", activeRooms);
     console.log("User Disconnected", socket.id);
     console.log("active rooms after disconnect: ", activeRooms);
   });
   
+
 });
 
 server.listen(3000, () => console.log("Server is up and running"));

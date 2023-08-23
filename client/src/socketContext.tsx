@@ -54,6 +54,7 @@ export const useSocket = () => useContext(SocketContext);
 const socket = io("http://localhost:3000", { autoConnect: false });
 
 const SocketProvider = ({ children }: PropsWithChildren) => {
+  //knappen lämna rum 
   const leaveRoom = () => {
     if (room !== "lobby") {
       socket.emit("leave_room");
@@ -91,11 +92,11 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
 
   const joinRoom = () => {
     if (room !== "") {
-      if (currentRoom !== "") {
+    
         socket.emit("leave_room");
-      }
+      
       setRoom(currentRoom);
-      socket.emit("join_room", currentRoom, username);
+      socket.emit("join_room", room, username);
       setMessageList([]);
     }
   };

@@ -5,7 +5,7 @@ import { useSocket } from './socketContext'
 
 
 function Chat() {
-    const {leaveRoom,room, currentMessage,setRoom, joinRoom, messageList, username, setCurrentMessage, sendMessage, currentRoom, setCurrentRoom, roomsList} = useSocket()
+    const {leaveRoom,room, currentMessage,setRoom, joinRoom, messageList, username, setCurrentMessage, sendMessage, setCurrentRoom, roomsList} = useSocket()
    
   
 
@@ -66,7 +66,7 @@ function Chat() {
         </div>
         <div>
        
-    <input value={currentRoom} onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
+    <input onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
      <button onClick={joinRoom}>Skapa rum</button>
                
                
