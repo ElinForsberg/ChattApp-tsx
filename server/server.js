@@ -51,16 +51,7 @@ socket.on("send_message", (data) => {
       socket.currentRoom = null;
     }
   });
-
-  // socket.on("disconnect", () => {
-  //   activeRooms = activeRooms.filter((room) => {
-  //     return io.sockets.adapter.rooms.get(room)?.size > 0;
-  //   });
-  //   io.sockets.emit("activeRooms", activeRooms);
-  //   console.log("User Disconnected", socket.id);
-  //   console.log("active rooms after disconnect: ", activeRooms);
-  // });
-  
+ 
   socket.on("disconnect", () => {
     // Ta bort användarens socket från rummet
     socket.leave("lobby");

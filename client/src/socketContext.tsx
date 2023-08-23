@@ -54,6 +54,7 @@ export const useSocket = () => useContext(SocketContext);
 const socket = io("http://localhost:3000", { autoConnect: false });
 
 const SocketProvider = ({ children }: PropsWithChildren) => {
+  
   //knappen lämna rum 
   const leaveRoom = () => {
     if (room !== "lobby") {
