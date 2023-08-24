@@ -18,7 +18,6 @@ io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
-
         if (socket.currentRoom) {
             socket.leave(socket.currentRoom);
             console.log(`User left room: ${socket.currentRoom}`);
@@ -31,7 +30,6 @@ io.on("connection", (socket) => {
           }
           io.sockets.emit('activeRooms', activeRooms);
 
-
           console.log(io.sockets.adapter.rooms);
           console.log("active rooms: ", activeRooms);
     })
@@ -40,22 +38,6 @@ socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
-
-
-  socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-  });
-  
-  socket.on("not_typing", (username) => {
-    socket.broadcast.emit("not_typing", username);
-  });
-
-
-  socket.on("users_in_room", (users)=>{
-    socket.broadcast.emit("users_in_room",users)
-  })
-
-})
 
   socket.on("leave_room", () => {
     if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
@@ -90,20 +72,6 @@ socket.on("send_message", (data) => {
     console.log("User Disconnected", socket.id);
     console.log("active rooms after disconnect: ", activeRooms);
   });
-  socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-  });
-  
-  socket.on("not_typing", (username) => {
-    socket.broadcast.emit("not_typing", username);
-  });
-
-
-  socket.on("users_in_room", (users)=>{
-    socket.broadcast.emit("users_in_room",users)
-  })
-
-})
   
 
 });
