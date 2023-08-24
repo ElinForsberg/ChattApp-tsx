@@ -83,14 +83,30 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     // const [showChat, setShowChat] = useState(false);
   
     //knappen lämna rum 
-    const leaveRoom = () => {
+  //   const leaveRoom = () => {
+  //   if (room !== "lobby") {
+  //     socket.emit("leave_room");
+  //     setRoom("lobby");
+  //     setMessageList([]); // Tömmer meddelandelistan när man lämnar rummet
+  //   }
+  // };
+
+  const leaveRoom = () => {
     if (room !== "lobby") {
-      socket.emit("leave_room");
-      setRoom("lobby");
-      setMessageList([]); // Tömmer meddelandelistan när man lämnar rummet
+      const roomSize = usersInRoom.length; // Antal användare i aktuellt rum
+      if (roomSize === 1) {
+        // Om du är den enda användaren i rummet, lämna det och gå till lobbyn
+        socket.emit("leave_room");
+        setRoom("lobby");
+        setMessageList([]); // Tömmer meddelandelistan när man lämnar rummet
+      } else {
+        // Om det finns andra användare i rummet, skicka inte "leave_room", bara gå till lobbyn
+        setRoom("lobby");
+        setMessageList([]); // Tömmer meddelandelistan när man lämnar rummet
+      }
     }
   };
-
+  
 
     
  useEffect(() => {
