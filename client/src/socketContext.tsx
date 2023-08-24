@@ -1,4 +1,5 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
+
 import { io } from "socket.io-client";
 
 interface ISocketContext {
@@ -19,6 +20,11 @@ interface ISocketContext {
   setCurrentRoom: React.Dispatch<React.SetStateAction<string>>;
   roomsList: string[];
   setRoomsList: React.Dispatch<React.SetStateAction<string[]>>;
+   typingUsers: string[], // Added typingUsers to the context value
+   isTyping: boolean, // Added isTyping to the context value
+   handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+   usersInRoom: string[]
+
 }
 
 interface messageData {
@@ -29,6 +35,7 @@ interface messageData {
 }
 
 const defaultValues = {
+
   username: "",
   setUsername: () => {},
   room: "",
@@ -45,18 +52,42 @@ const defaultValues = {
   currentRoom: "",
   setCurrentRoom: () => {},
   roomsList: [],
-  setRoomsList: () => []
+  setRoomsList: () => [],
+  typingUsers: [], // Initialize as an empty array
+  isTyping: false,  // Added isTyping to the context value
+  handleInput: () => {},
+  usersInRoom:[],
+    
 };
+
 
 const SocketContext = createContext<ISocketContext>(defaultValues);
 export const useSocket = () => useContext(SocketContext);
 
+
+const SocketContext = createContext<ISocketContext>(defaultValues);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useSocket = () => useContext(SocketContext);
+
 const socket = io("http://localhost:3000", { autoConnect: false });
 
-const SocketProvider = ({ children }: PropsWithChildren) => {
+const SocketProvider = ({children}: PropsWithChildren) => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [username, setUsername] = useState<string>("");
+    const [room, setRoom] = useState("");
+    const [currentMessage, setCurrentMessage] = useState("");
+    const [messageList, setMessageList] = useState<messageData[]>([]);
+    const [currentRoom, setCurrentRoom] = useState("");
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const [isTyping, setIsTyping] = useState(false);
+    const [usersInRoom, setUsersInRoom] = useState<string[]>([]);
+    const [roomsList, setRoomsList] = useState<string[]>([]);
+    
+    // const [showChat, setShowChat] = useState(false);
   
-  //knappen lämna rum 
-  const leaveRoom = () => {
+    //knappen lämna rum 
+    const leaveRoom = () => {
     if (room !== "lobby") {
       socket.emit("leave_room");
       setRoom("lobby");
@@ -64,15 +95,9 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState<string>("");
-  const [room, setRoom] = useState("");
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [messageList, setMessageList] = useState<messageData[]>([]);
-  const [currentRoom, setCurrentRoom] = useState("");
-  const [roomsList, setRoomsList] = useState<string[]>([]);
 
-  useEffect(() => {
+    
+ useEffect(() => {
     if (room) {
       socket.emit("join_room", room);
     }
@@ -84,6 +109,68 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
     setRoom("lobby");
     console.log(username);
   };
+    }
+      
+    useEffect(() => {
+      socket.on("receive_message", (data) => {
+        setMessageList((list) => [...list, data]);
+        setIsTyping(false);      
+      });
+    }, [isTyping]);
+  
+    useEffect(() => {
+      socket.on("typing", (username) => {
+        if (!typingUsers.includes(username)) {
+          setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
+           
+        }
+        setIsTyping(true);
+         
+      });
+  
+      socket.on("not_typing", (username) => {
+        setTypingUsers((prevTypingUsers) =>
+          prevTypingUsers.filter((user) => user !== username)
+        );    
+        console.log(setIsTyping)
+        if (typingUsers.length === 0) {
+          setIsTyping(false);
+           
+        }
+      });
+  
+      return () => {
+        socket.off("receive_message");
+        socket.off("typing");
+        socket.off("not_typing");
+         
+      };
+    }, [isTyping, typingUsers]);
+  
+    const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const inputMessage = event.target.value;
+      setCurrentMessage(inputMessage);
+  
+      if (inputMessage.trim() !== "") {
+        socket.emit("typing", username);
+      } else {
+        socket.emit("not_typing", username);
+      }
+    };
+
+    const joinRoom = () => {
+        if ( room !== "") {
+            setRoom(currentRoom);
+            socket.emit("join_room", room, username);
+            const updatedUsersInRoom = [...usersInRoom, username]; // Add current user's username
+            setUsersInRoom(updatedUsersInRoom); // Update the local state
+    
+            socket.emit("users_in_room", updatedUsersInRoom); // Emit the updated list of users
+            // setShowChat(true);
+            console.log(room);
+            console.log(usersInRoom)
+          }
+    }
 
   useEffect(() => {
     socket.on("activeRooms", function (activeRooms) {
@@ -94,11 +181,13 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
   const joinRoom = () => {
     if (room !== "") {
     
+
         socket.emit("leave_room");
       
       setRoom(currentRoom);
       socket.emit("join_room", room, username);
       setMessageList([]);
+        
     }
   };
 
@@ -117,6 +206,7 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
       await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
+      setIsTyping(false)
     }
   };
 
@@ -125,6 +215,17 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
+        
+     useEffect(() => {
+     socket.on("users_in_room", (users) => {
+            setUsersInRoom(users);
+        });
+
+        return () => {
+            socket.off("users_in_room");
+        };
+    }, []);
+
 
   return (
     <SocketContext.Provider
@@ -145,7 +246,11 @@ const SocketProvider = ({ children }: PropsWithChildren) => {
         currentRoom,
         setCurrentRoom,
         roomsList,
-        setRoomsList
+        setRoomsList,
+        typingUsers,
+        isTyping,
+        handleInput,
+        usersInRoom
       }}
     >
       {children}
