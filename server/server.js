@@ -2,7 +2,6 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -13,31 +12,35 @@ const io = new Server(server, {
 
 app.use(cors());
 
-//här kan man göra en variabel som tar in lista på alla rum. om rummet redan finns, lägg inte till annars lägg till. bygg logik för detta
+let activeRooms = [];
 
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     socket.on("join_room", (room) => {
-        //här lämna de rum som är med i redan  
 
-        const rooms = socket.rooms;
-
-        socket.leaveAll(rooms, function(err){
+        if (socket.currentRoom) {
+            socket.leave(socket.currentRoom);
+            console.log(`User left room: ${socket.currentRoom}`);
+          }
           
-        })
-        
-        socket.join(room);
-      
-        console.log(socket.rooms);
-        console.log(io.sockets.adapter.rooms);
-    })
+          socket.join(room);
+          socket.currentRoom = room; 
+          if (!activeRooms.includes(room)) {
+            activeRooms.push(room);
+          }
+          io.sockets.emit('activeRooms', activeRooms);
 
+
+          console.log(io.sockets.adapter.rooms);
+          console.log("active rooms: ", activeRooms);
+    })
 
 socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
+
 
   socket.on("typing", (username) => {
     socket.broadcast.emit("typing", username);
@@ -53,5 +56,57 @@ socket.on("send_message", (data) => {
   })
 
 })
+
+  socket.on("leave_room", () => {
+    if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
+      socket.leave(socket.currentRoom); //
+      console.log(`User left room: ${socket.currentRoom}`);
+      const index = activeRooms.indexOf(socket.currentRoom);
+      if (index !== -1) {
+        activeRooms.splice(index, 1); // Ta bort rummet från activeRooms
+      }
+      io.sockets.emit('activeRooms', activeRooms); // Uppdaterade listan över activeRooms
+      socket.currentRoom = null;
+    }
+  });
+ 
+  socket.on("disconnect", () => {
+    // Ta bort användarens socket från rummet
+    socket.leave("lobby");
+  
+    // Uppdatera listan över aktiva rum och inkludera alltid "lobby"
+    activeRooms = Array.from(new Set([...activeRooms, "lobby"]));
+  
+    // Filtrera bort tomma rum från listan (utom "lobby")
+    activeRooms = activeRooms.filter(room => {
+      if (room === "lobby") {
+        return true; // Behåll alltid "lobby"
+      }
+      const roomSize = io.sockets.adapter.rooms.get(room)?.size;
+      return roomSize && roomSize > 0;
+    });
+  
+    io.sockets.emit("activeRooms", activeRooms);
+    console.log("User Disconnected", socket.id);
+    console.log("active rooms after disconnect: ", activeRooms);
+  });
+  socket.on("typing", (username) => {
+    socket.broadcast.emit("typing", username);
+  });
+  
+  socket.on("not_typing", (username) => {
+    socket.broadcast.emit("not_typing", username);
+  });
+
+
+  socket.on("users_in_room", (users)=>{
+    socket.broadcast.emit("users_in_room",users)
+  })
+
+})
+  
+
+});
+
 server.listen(3000, () => console.log("Server is up and running"));
 

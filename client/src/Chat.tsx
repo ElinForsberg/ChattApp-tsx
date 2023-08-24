@@ -1,20 +1,32 @@
 
-
 import { useSocket } from './socketContext'
 
-
-
 function Chat() {
-    const {room, currentMessage, joinRoom, messageList, username, sendMessage, currentRoom, setCurrentRoom, isTyping, typingUsers, handleInput, usersInRoom} = useSocket()
-   
-
-
+  const {leaveRoom,
+    room, 
+    currentMessage,
+    setRoom, 
+    joinRoom, 
+    messageList, 
+    username, 
+    setCurrentMessage, 
+    sendMessage, 
+    setCurrentRoom,
+    isTyping,
+    typingUsers,
+    handleInput,
+    usersInRoom
+    roomsList} = useSocket()
+    
     return (
-      <div className="chat-window">
-        <div className="chat-header">
-          <p>Live Chat</p>
+    <div className="chat-window">
+
+      <div className="chat-header">
+        <p>Live Chat</p>
         </div>
+        
         <div className="chat-body">
+
         <div className="message-container">
                     <div className="feedback">
           {isTyping && (
@@ -32,6 +44,7 @@ function Chat() {
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
+
                   <div>
                     <div className="message-content">
    
@@ -49,6 +62,7 @@ function Chat() {
             })}
           </div>
         </div>
+
         <div className="chat-footer">
         <input
           type="text"
@@ -63,11 +77,22 @@ function Chat() {
         
           <button onClick={sendMessage}>&#9658;</button>
         </div>
-        <div>
-          <p>Du är i rum: {room}</p>
-          <p>Alla aktiva rum:</p>
-          <p>Alla aktiva användare: </p>
+
+
+        <div className='sidebar'>
+        <p>Du är inloggad som: {username}</p><br />
+        <p>Du är i rum: {room}</p><br />
+        <button onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
+        <p>Alla aktiva rum: </p>
           <ul>
+            {roomsList.map((activeRoom) => (
+              <li key={activeRoom} value={activeRoom} onClick={() => setRoom(activeRoom)}>
+                {activeRoom}
+                </li>
+
+            ))}
+          </ul>
+                   <ul>
                     {usersInRoom.map((user) => (
                       <div>
                         <li key={user}>{user}</li>
@@ -75,14 +100,10 @@ function Chat() {
                     ))}
                     
                 </ul>
-          {/* <ul>
-            {activeRooms.map((activeRoom) => (
-              <li key={activeRoom}>{activeRoom}</li>
-            ))}
-          </ul> */}
         </div>
         <div>
        
+
     <input value={currentRoom} onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
      <button onClick={joinRoom}>Skapa rum</button>
                
@@ -94,16 +115,6 @@ function Chat() {
    
   }
 
-//   return (
 
-//     <div>
-       
-//         <input value={room} onChange={(e) => setRoom(e.target.value)} type ="text"/>
-//         <button onClick={joinRoom}>Skapa rum</button>
-        
-        
-//     </div>
-//   )
-// }
 
 export default Chat
