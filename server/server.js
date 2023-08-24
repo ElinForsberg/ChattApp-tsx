@@ -46,7 +46,12 @@ socket.on("send_message", (data) => {
   socket.on("not_typing", (username) => {
     socket.broadcast.emit("not_typing", username);
   });
-  
+
+
+  socket.on("users_in_room", (users)=>{
+    socket.broadcast.emit("users_in_room",users)
+  })
+
 })
 server.listen(3000, () => console.log("Server is up and running"));
 

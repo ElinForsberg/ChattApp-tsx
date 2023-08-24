@@ -19,6 +19,7 @@ interface ISocketContext {
     typingUsers: string[], // Added typingUsers to the context value
     isTyping: boolean, // Added isTyping to the context value
     handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    usersInRoom: string[]
 }
 
 interface messageData {
@@ -49,12 +50,14 @@ const defaultValues = {
     typingUsers: [], // Initialize as an empty array
     isTyping: false,  // Added isTyping to the context value
     handleInput: () => {},
+    usersInRoom:[],
 
     
 }
 
 const SocketContext = createContext<ISocketContext>(defaultValues);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSocket = () => useContext(SocketContext);
 
 const socket = io("http://localhost:3000", { autoConnect: false });
@@ -68,21 +71,12 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [currentRoom, setCurrentRoom] = useState("");
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const [isTyping, setIsTyping] = useState(false);
+    const [usersInRoom, setUsersInRoom] = useState<string[]>([]);
+    
     
     // const [showChat, setShowChat] = useState(false);
 
-    
-      const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputMessage = event.target.value;
-        setCurrentMessage(inputMessage);
-    
-        if (inputMessage.trim() !== "") {
-          socket.emit("typing", username);
-        } else {
-          socket.emit("not_typing", username);
-        }
-      };
-    
+
     
     useEffect(() => {
         if(room){
@@ -98,14 +92,65 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         console.log(username);
         
     }
+      
+    useEffect(() => {
+      socket.on("receive_message", (data) => {
+        setMessageList((list) => [...list, data]);
+        setIsTyping(false);      
+      });
+    }, [isTyping]);
+  
+    useEffect(() => {
+      socket.on("typing", (username) => {
+        if (!typingUsers.includes(username)) {
+          setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
+           
+        }
+        setIsTyping(true);
+         
+      });
+  
+      socket.on("not_typing", (username) => {
+        setTypingUsers((prevTypingUsers) =>
+          prevTypingUsers.filter((user) => user !== username)
+        );    
+        console.log(setIsTyping)
+        if (typingUsers.length === 0) {
+          setIsTyping(false);
+           
+        }
+      });
+  
+      return () => {
+        socket.off("receive_message");
+        socket.off("typing");
+        socket.off("not_typing");
+         
+      };
+    }, [isTyping, typingUsers]);
+  
+    const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const inputMessage = event.target.value;
+      setCurrentMessage(inputMessage);
+  
+      if (inputMessage.trim() !== "") {
+        socket.emit("typing", username);
+      } else {
+        socket.emit("not_typing", username);
+      }
+    };
 
     const joinRoom = () => {
         if ( room !== "") {
             setRoom(currentRoom);
             socket.emit("join_room", room, username);
-            
+            const updatedUsersInRoom = [...usersInRoom, username]; // Add current user's username
+            setUsersInRoom(updatedUsersInRoom); // Update the local state
+    
+            socket.emit("users_in_room", updatedUsersInRoom); // Emit the updated list of users
             // setShowChat(true);
             console.log(room);
+            console.log(usersInRoom)
           }
     }
 
@@ -124,40 +169,20 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           await socket.emit("send_message", messageData);
           setMessageList((list) => [...list, messageData]);
           setCurrentMessage("");
+          setIsTyping(false)
+           
         }
       };
-
       useEffect(() => {
-        socket.on("receive_message", (data) => {
-          setMessageList((list) => [...list, data]);
+        socket.on("users_in_room", (users) => {
+            setUsersInRoom(users);
         });
-      }, []);
-      useEffect(() => {
-        const handleTyping = (username: string) => {
-          if (!typingUsers.includes(username)) {
-            setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
-          }
-          setIsTyping(true);
-        };
-    
-        const handleNotTyping = (username: string) => {
-          setTypingUsers((prevTypingUsers) =>
-            prevTypingUsers.filter((user) => user !== username)
-          );
-          if (typingUsers.length === 0) {
-            setIsTyping(false);
-          }
-        };
-    
-        socket.on("typing", handleTyping);
-        socket.on("not_typing", handleNotTyping);
-       
-    
+
         return () => {
-          socket.off("typing", handleTyping);
-          socket.off("not_typing", handleNotTyping);
+            socket.off("users_in_room");
         };
-      }, [typingUsers]);
+    }, []);
+       
 
     return (
         <SocketContext.Provider value={{username, 
@@ -174,9 +199,10 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         sendMessage, 
         currentRoom, 
         setCurrentRoom,
-        typingUsers, // Added typingUsers to the context value
-        isTyping, // Added isTyping to the context value
-        handleInput
+        typingUsers,
+        isTyping,
+        handleInput,
+        usersInRoom
 
         }}>
             {children}
