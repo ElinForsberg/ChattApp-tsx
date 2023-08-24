@@ -55,7 +55,7 @@ socket.on("send_message", (data) => {
     socket.broadcast.emit("users_in_room",users)
   })
 
-})
+
 
   socket.on("leave_room", () => {
     if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
@@ -106,7 +106,7 @@ socket.on("send_message", (data) => {
 })
   
 
-});
+
 
 server.listen(3000, () => console.log("Server is up and running"));
 

@@ -9,26 +9,24 @@ function Chat() {
     joinRoom, 
     messageList, 
     username, 
-    setCurrentMessage, 
     sendMessage, 
     setCurrentRoom,
     isTyping,
     typingUsers,
     handleInput,
-    usersInRoom
-    roomsList} = useSocket()
+    usersInRoom,
+    roomsList
+  } = useSocket()
     
     return (
     <div className="chat-window">
-
       <div className="chat-header">
         <p>Live Chat</p>
-        </div>
-        
+        </div> 
         <div className="chat-body">
 
         <div className="message-container">
-                    <div className="feedback">
+             <div className="feedback">
           {isTyping && (
               <p>
                 {typingUsers.join(", ")}{" "}
@@ -104,7 +102,7 @@ function Chat() {
         <div>
        
 
-    <input value={currentRoom} onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
+    <input onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/>
      <button onClick={joinRoom}>Skapa rum</button>
                
                

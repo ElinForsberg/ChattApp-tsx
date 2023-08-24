@@ -62,10 +62,6 @@ const defaultValues = {
 
 
 const SocketContext = createContext<ISocketContext>(defaultValues);
-export const useSocket = () => useContext(SocketContext);
-
-
-const SocketContext = createContext<ISocketContext>(defaultValues);
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useSocket = () => useContext(SocketContext);
@@ -109,7 +105,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     setRoom("lobby");
     console.log(username);
   };
-    }
+    
       
     useEffect(() => {
       socket.on("receive_message", (data) => {
@@ -178,19 +174,6 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     });
   }, []);
 
-  const joinRoom = () => {
-    if (room !== "") {
-    
-
-        socket.emit("leave_room");
-      
-      setRoom(currentRoom);
-      socket.emit("join_room", room, username);
-      setMessageList([]);
-        
-    }
-  };
-
   const sendMessage = async () => {
     if (currentMessage !== "") {
       const messageData = {
@@ -214,7 +197,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-  }, [socket]);
+  }, []);
         
      useEffect(() => {
      socket.on("users_in_room", (users) => {
