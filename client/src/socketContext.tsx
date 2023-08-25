@@ -180,8 +180,10 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
             socket.emit("users_in_room", updatedUsersInRoom); // Emit the updated list of users
             // setShowChat(true);
+            
             console.log(room);
             console.log(usersInRoom)
+            
           }
     }
 

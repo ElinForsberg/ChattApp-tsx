@@ -1,5 +1,7 @@
 
 import { useSocket } from './socketContext'
+import liveChatIcon from './assets/live-chat-icon-7417.png';
+
 
 function Chat() {
   const {leaveRoom,
@@ -21,18 +23,24 @@ function Chat() {
     
     return (
       <div>
-        <div className="sidebar-container">
+        <div className="container">
           <div className='sidebar'>
          <div>
+        <img src={liveChatIcon} width="100px"/>
+        <h1 className="logo">Chat App</h1>
        <input className="room-input" onChange={(e) => setCurrentRoom(e.target.value)} type ="text"/><br/>
         <button className="chatBtn" onClick={joinRoom}>Skapa rum</button>              
         </div>
    
         <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
-        <p>Alla aktiva rum: </p>
+        <p className='active-rooms-list'>Alla aktiva rum: </p>
           <ul>
             {roomsList.map((activeRoom) => (
-              <li key={activeRoom} value={activeRoom} onClick={() => {setRoom(activeRoom); setMessageList([]); }}>
+
+              
+
+              <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => {setRoom(activeRoom); setMessageList([]); }}>
+
                 {activeRoom}
                 </li>
 
@@ -47,6 +55,7 @@ function Chat() {
                     
                 </ul>
         </div>
+      <div className="chat">
       <div className="chat-container">
       <h2>Du är inloggad som: {username}</h2><br />
       <h2>Du är i rum: {room}</h2><br />
@@ -110,6 +119,7 @@ function Chat() {
 
        
         
+      </div>
       </div>
       </div>
       </div>
