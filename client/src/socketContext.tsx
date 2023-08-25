@@ -174,6 +174,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         if ( room !== "") {
             setRoom(currentRoom);
             socket.emit("join_room", room, username);
+            setMessageList([]);
             const updatedUsersInRoom = [...usersInRoom, username]; // Add current user's username
             setUsersInRoom(updatedUsersInRoom); // Update the local state
     

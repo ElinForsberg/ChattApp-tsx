@@ -15,7 +15,8 @@ function Chat() {
     typingUsers,
     handleInput,
     usersInRoom,
-    roomsList
+    roomsList,
+    setMessageList
   } = useSocket()
     
     return (
@@ -31,7 +32,7 @@ function Chat() {
         <p>Alla aktiva rum: </p>
           <ul>
             {roomsList.map((activeRoom) => (
-              <li key={activeRoom} value={activeRoom} onClick={() => setRoom(activeRoom)}>
+              <li key={activeRoom} value={activeRoom} onClick={() => {setRoom(activeRoom); setMessageList([]); }}>
                 {activeRoom}
                 </li>
 
