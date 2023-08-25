@@ -29,8 +29,18 @@ io.on("connection", (socket) => {
           if (!activeRooms.includes(room)) {
             activeRooms.push(room);
           }
-          io.sockets.emit('activeRooms', activeRooms);
+          // io.sockets.emit('activeRooms', activeRooms);
 
+          activeRooms = activeRooms.filter(room => {
+            if (room === "lobby") {
+              return true; 
+              //Filtrerar activeRooms. För varje rum i listan kontrolleras om det är rummet "lobby". Om det är så returneras true -"lobby" alltid behålls i listan.
+            }
+            const roomSize = io.sockets.adapter.rooms.get(room)?.size; //hämtar antal användare i rummet. Om roomSize är null eller undefined, betyder det att rummet är tomt, och i det fallet kommer det att filtreras bort från listan.
+            return roomSize && roomSize > 0; //Om roomSize är definierad och större än noll finns användare i rummet och rummet behålls. 
+          });
+        
+          io.sockets.emit("activeRooms", activeRooms);
 
           console.log(io.sockets.adapter.rooms);
           console.log("active rooms: ", activeRooms);
