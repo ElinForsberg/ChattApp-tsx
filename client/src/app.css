@@ -43,9 +43,16 @@ border-radius: 5px;
 margin-bottom: 20px;
 width: 130px;
 border-radius: 5px;
-
-
 }
+
+.active-rooms-list {
+    font-size: 20px;
+}
+
+.roomsList{
+    font-size: 18px;
+}
+
 .chat {
     width: 100vw;
     display: flex;

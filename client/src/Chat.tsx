@@ -32,10 +32,10 @@ function Chat() {
         </div>
    
         <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
-        <p>Alla aktiva rum: </p>
+        <p className='active-rooms-list'>Alla aktiva rum: </p>
           <ul>
             {roomsList.map((activeRoom) => (
-              <li key={activeRoom} value={activeRoom} onClick={() => setRoom(activeRoom)}>
+              <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => setRoom(activeRoom)}>
                 {activeRoom}
                 </li>
 
