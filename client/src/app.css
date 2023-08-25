@@ -13,42 +13,40 @@ body {
 }
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700");
 
-.joinChatContainer {
- display: flex;
- flex-direction: column;
- text-align: center;
+
+.sidebar-container{
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+.sidebar {
+    
 }
 
-.joinChatContainer h3 {
- font-size: 2.5rem;
- margin-bottom: 1rem;
-}
-.joinChatContainer input {
- width: 210px;
- height: 40px;
- margin: 7px;
- border: 2px solid #43a047;
- border-radius: 5px;
- padding: 5px;
- font-size: 16px;
+.room-input {
+margin-top:30px;
+margin-bottom: 5px;
+width: 130px;
+height:20px;
+border-radius: 5px;
+
 }
 
-.joinChatContainer button {
- width: 225px;
- height: 50px;
- margin: 7px;
- border: none;
- border-radius: 5px;
- padding: 5px;
- font-size: 16px;
- background: #43a047;
- color: #fff;
- cursor: pointer;
+.chatBtn {
+margin-bottom: 20px;
+width: 130px;
+border-radius: 5px;
+
+
 }
 
-.joinChatContainer button:hover {
- background: #2e7d32;
+.chat-container {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    
 }
+
 
 .chat-window {
  width: 300px;
