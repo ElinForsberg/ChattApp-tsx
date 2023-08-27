@@ -93,14 +93,16 @@ function Chat() {
                       <p>{messageContent.message}</p>
                       <img src={gif} width="100px"/>
                     </div> */}
-                    <div className="message-content">
+                    
                     {messageContent.message.startsWith("https://media") ? (
-                    <img src={messageContent.message} alt="gif" width="150px" />
-              // <img src={gif} alt="gif" width="100px" />
+                    <img id="gif-content"src={messageContent.message} alt="gif" width="150px" />
+                    
                     ) : (
+                      <div className="message-content">
                     <p>{messageContent.message}</p>
-                    )}
                     </div>
+                    )}
+                    
                     <div className="message-meta">
                       <p id="time">{messageContent.time}</p>
                       <p id="author">{messageContent.author}</p>
