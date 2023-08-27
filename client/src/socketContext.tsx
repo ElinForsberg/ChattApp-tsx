@@ -24,6 +24,12 @@ interface ISocketContext {
    isTyping: boolean, // Added isTyping to the context value
    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
    usersInRoom: string[]
+   gif: string;
+   setGif: React.Dispatch<React.SetStateAction<string>>
+   fetchGif: () => void
+   sendGif: string;
+   setSendGif: React.Dispatch<React.SetStateAction<string>>
+   
 
 }
 
@@ -32,6 +38,7 @@ interface messageData {
   author: string;
   message: string;
   time: string;
+  
 }
 
 const defaultValues = {
@@ -57,6 +64,11 @@ const defaultValues = {
   isTyping: false,  // Added isTyping to the context value
   handleInput: () => {},
   usersInRoom:[],
+  gif: "",
+  setGif: () => {},
+  fetchGif: () => {},
+  sendGif: "",
+  setSendGif: () => {}
     
 };
 
@@ -79,6 +91,8 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [isTyping, setIsTyping] = useState(false);
     const [usersInRoom, setUsersInRoom] = useState<string[]>([]);
     const [roomsList, setRoomsList] = useState<string[]>([]);
+    const [gif, setGif] = useState<string>("");
+    const [sendGif, setSendGif ]= useState<string>("");
     
     // const [showChat, setShowChat] = useState(false);
   
@@ -193,30 +207,71 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     });
   }, []);
 
+  // const sendMessage = async () => {
+  //   if (currentMessage !== "") {
+  //     const messageData = {
+  //       room: room,
+  //       author: username,
+  //       message: currentMessage,
+  //       time:
+  //         new Date(Date.now()).getHours() +
+  //         ":" +
+  //         new Date(Date.now()).getMinutes(),
+  //     };
+
+  //     await socket.emit("send_message", messageData);
+  //     setMessageList((list) => [...list, messageData]);
+  //     setCurrentMessage("");
+  //     setIsTyping(false)
+  //   }
+  // };
   const sendMessage = async () => {
     if (currentMessage !== "") {
-      const messageData = {
-        room: room,
-        author: username,
-        message: currentMessage,
-        time:
-          new Date(Date.now()).getHours() +
-          ":" +
-          new Date(Date.now()).getMinutes(),
-      };
-
+      let messageData: messageData;
+      if (currentMessage.match("/gif")) {
+       
+        fetchGif();
+       
+        // setSendGif(gif);
+        
+        // const gifUrl = currentMessage.slice(5); // Assuming the gif URL is provided after "/gif "
+        messageData = {
+          room: room,
+          author: username, // Use the current user's username as the author
+          message: gif,
+          time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+        };
+      } else {
+        messageData = {
+          room: room,
+          author: username,
+          message: currentMessage,
+          time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+        };
+      }
+      
       await socket.emit("send_message", messageData);
+      
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
-      setIsTyping(false)
     }
   };
+  
 
   useEffect(() => {
+      socket.on("receiveGif", (gifUrl) => {
+      setGif(gifUrl);
+   });
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
+    
+  //   socket.on("receiveGif", (gifUrl) => {
+  //     setGif(gifUrl);
+  // });
   }, []);
+  
+  
         
      useEffect(() => {
      socket.on("users_in_room", (users) => {
@@ -227,7 +282,36 @@ const SocketProvider = ({children}: PropsWithChildren) => {
             socket.off("users_in_room");
         };
     }, []);
+   
+    const fetchGif = async () => {
+      try {
+          
+          const giphyUrl = "https://api.giphy.com/v1/gifs/random?api_key=lwMa3B9QFK1Z9GZRQu1iZkhRWkiQoZXp&tag=&rating=g";
+          const response = await fetch(giphyUrl);
+          const data = await response.json();
+          const gifUrl = data.data.images.downsized.url;
+          // setGif(data.data.images.downsized.url);
+           setGif(gifUrl);
+          
+          console.log(data);
+          console.log(data.data.images.downsized.url);
+         
+           socket.emit("sendGif", gifUrl);
 
+          // socket.on("receiveGif", (gifUrl) => {
+          //     setGif(gifUrl);
+              
+              
+          // });
+         
+          
+      } catch (error) {
+          console.log(error);
+          
+      }
+  };
+  
+  
 
   return (
     <SocketContext.Provider
@@ -252,7 +336,12 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         typingUsers,
         isTyping,
         handleInput,
-        usersInRoom
+        usersInRoom,
+        gif,
+        setGif,
+        fetchGif,
+        sendGif,
+        setSendGif
       }}
     >
       {children}

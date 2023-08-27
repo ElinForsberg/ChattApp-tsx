@@ -113,6 +113,13 @@ socket.on("send_message", (data) => {
     socket.broadcast.emit("users_in_room",users)
   })
 
+  socket.on("sendGif", (gifUrl) => {
+    console.log("user sent gif :", gifUrl);
+    // Broadcast the GIF data to all connected clients
+    io.emit("receiveGif", gifUrl);
+    console.log("user recieved gif :", gifUrl);
+});
+
 })
   
 
