@@ -18,10 +18,9 @@ function Chat() {
     handleInput,
     usersInRoom,
     roomsList,
-    setMessageList,
-   /* gif,
-    setGif,
-    fetchGif*/
+
+    setMessageList, 
+
   } = useSocket()
     
     return (
@@ -70,13 +69,28 @@ function Chat() {
 
         <div className="message-container">
              <div className="feedback">
-          {isTyping && (
+          {isTyping &&  (
               <p>
                 {typingUsers.join(", ")}{" "}
                 {typingUsers.length === 1 ? "is" : "are"} typing now...
               </p>
             )}
           </div>
+          {/* <div className="feedback">
+    {room === "lobby" && isTyping && typingUsers.length > 0 && (
+      <p>
+        {typingUsers.length === 1 ? (
+          <>
+            {typingUsers[0]} is typing now...
+          </>
+        ) : (
+          <>
+            {typingUsers.slice(0, -1).join(", ")} and {typingUsers.slice(-1)} are typing now...
+          </>
+        )}
+      </p>
+    )}
+  </div> */}
           {messageList.map((messageContent, index) => {
             
             return (

@@ -137,6 +137,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   };
     
       
+
   useEffect(() => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
@@ -170,6 +171,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       socket.off("typing");
       socket.off("not_typing");
        
+
     };
   }, [isTyping, room, typingUsers]);
 
@@ -232,14 +234,14 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       let messageData: messageData;
       if (currentMessage.match("/gif")) {
        
-         await fetchGif();
+         const url= await fetchGif();
         
         
         // const gifUrl = currentMessage.slice(5); // Assuming the gif URL is provided after "/gif "
         messageData = {
           room: room,
           author: username, // Use the current user's username as the author
-          message: gif,
+          message: url,
           time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
         };
       } else {
@@ -260,9 +262,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   
 
   useEffect(() => {
-      socket.on("receiveGif", (gifUrl) => {
-      setGif(gifUrl);
-   });
+    //   // socket.on("receiveGif", (gifUrl) => {
+    //   // setGif(gifUrl);
+    // });
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
@@ -292,16 +294,17 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           const data = await response.json();
           const gifUrl = data.data.images.downsized.url;
           // setGif(data.data.images.downsized.url);
-           setGif(gifUrl);
+          //  setGif(gifUrl);
           
           console.log(data);
           console.log(data.data.images.downsized.url);
          
-           socket.emit("sendGif", gifUrl);
+          //  socket.emit("sendGif", gifUrl);
 
           // socket.on("receiveGif", (gifUrl) => {
           //     setGif(gifUrl);
               
+              return gifUrl
               
           // });
          
