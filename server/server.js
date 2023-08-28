@@ -13,21 +13,26 @@ const io = new Server(server, {
 app.use(cors());
 
 let activeRooms = [];
+let users = [];
 
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
-    socket.on("join_room", (room) => {
+    socket.on("join_room", (room, username) => {
 
         if (socket.currentRoom) {
             socket.leave(socket.currentRoom);
             console.log(`User left room: ${socket.currentRoom}`);
           }
           
-          socket.join(room);
+          socket.join(room, username);
           socket.currentRoom = room; 
           if (!activeRooms.includes(room)) {
             activeRooms.push(room);
+          }
+          if (socket.currentRoom == room && !users.includes(username)) {
+            users.push(username);
+            console.log("användare till lista",users);
           }
           // io.sockets.emit('activeRooms', activeRooms);
 
@@ -54,16 +59,17 @@ socket.on("send_message", (data) => {
 
   socket.on("typing", (username) => {
     socket.broadcast.emit("typing", username);
+    console.log({username},"is typing");
   });
   
   socket.on("not_typing", (username) => {
-    socket.broadcast.emit("not_typing", username);
+    socketbroadcast.emit("not_typing", username);
   });
 
 
-  socket.on("users_in_room", (users)=>{
-    socket.broadcast.emit("users_in_room",users)
-  })
+  // socket.on("users_in_room", (users)=>{
+  //   socket.broadcast.emit("users_in_room",users)
+  // })
 
 
 
@@ -109,9 +115,9 @@ socket.on("send_message", (data) => {
   });
 
 
-  socket.on("users_in_room", (users)=>{
-    socket.broadcast.emit("users_in_room",users)
-  })
+  // socket.on("users_in_room", (users)=>{
+  //   socket.broadcast.emit("users_in_room",users)
+  // })
 
   socket.on("sendGif", (gifUrl) => {
     console.log("user sent gif :", gifUrl);
