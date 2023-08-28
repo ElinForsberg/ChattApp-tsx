@@ -18,7 +18,10 @@ function Chat() {
     handleInput,
     usersInRoom,
     roomsList,
-    setMessageList
+    setMessageList,
+   /* gif,
+    setGif,
+    fetchGif*/
   } = useSocket()
     
     return (
@@ -82,22 +85,37 @@ function Chat() {
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
+                
 
                   <div>
-                    <div className="message-content">
-   
+                    {/* <div className="message-content">
+                        
                       <p>{messageContent.message}</p>
+                      <img src={gif} width="100px"/>
+                    </div> */}
+                    
+                    {messageContent.message.startsWith("https://media") ? (
+                    <img id="gif-content"src={messageContent.message} alt="gif" width="150px" />
+                    
+                    ) : (
+                      <div className="message-content">
+                    <p>{messageContent.message}</p>
                     </div>
-
+                    )}
+                    
                     <div className="message-meta">
                       <p id="time">{messageContent.time}</p>
                       <p id="author">{messageContent.author}</p>
                     
                     </div>
+                    
                   </div>
                 </div>
               );
             })}
+             {/* <div className="gif">
+                
+        </div> */}
           </div>
         </div>
 
@@ -114,9 +132,11 @@ function Chat() {
         />
         
           <button onClick={sendMessage}>&#9658;</button>
+          
         </div>
           
-
+      
+       
        
         
       </div>
