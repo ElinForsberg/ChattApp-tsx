@@ -19,9 +19,9 @@ function Chat() {
     usersInRoom,
     roomsList,
     setMessageList,
-    gif,
+   /* gif,
     setGif,
-    fetchGif
+    fetchGif*/
   } = useSocket()
     
     return (

@@ -56,15 +56,15 @@ socket.on("send_message", (data) => {
     console.log(data);
   });
 
-
+//Sends user is typing in the same room as the writer
   socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-    console.log({username},"is typing");
+    socket.to(socket.currentRoom).emit("typing", username); 
   });
   
   socket.on("not_typing", (username) => {
-    socketbroadcast.emit("not_typing", username);
+    socket.to(socket.currentRoom).emit("not_typing", username);
   });
+  
 
 
   // socket.on("users_in_room", (users)=>{
@@ -106,13 +106,7 @@ socket.on("send_message", (data) => {
     console.log("User Disconnected", socket.id);
     console.log("active rooms after disconnect: ", activeRooms);
   });
-  socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-  });
-  
-  socket.on("not_typing", (username) => {
-    socket.broadcast.emit("not_typing", username);
-  });
+
 
 
   // socket.on("users_in_room", (users)=>{
