@@ -144,44 +144,123 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       });
     }, [isTyping]);
   
-    useEffect(() => {
-      socket.on("typing", (username) => {
-        if (!typingUsers.includes(username)) {
-          setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
+    // useEffect(() => {
+    //   socket.on("typing", (username) => {
+    //     if (!typingUsers.includes(username)) {
+    //       setTypingUsers((prevTypingUsers) => [...prevTypingUsers, username]);
            
+    //     }
+    //     setIsTyping(true);
+         
+    //   });
+  
+    //   socket.on("not_typing", (username) => {
+    //     setTypingUsers((prevTypingUsers) =>
+    //       prevTypingUsers.filter((user) => user !== username)
+    //     );    
+    //     console.log(setIsTyping)
+    //     if (typingUsers.length === 0) {
+    //       setIsTyping(false);
+           
+    //     }
+    //   });
+  
+    //   return () => {
+    //     socket.off("receive_message");
+    //     socket.off("typing");
+    //     socket.off("not_typing");
+         
+    //   };
+    // }, [isTyping, typingUsers]);
+  
+    // const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //   const inputMessage = event.target.value;
+    //   setCurrentMessage(inputMessage);
+  
+    //   if (inputMessage.trim() !== "") {
+    //     socket.emit("typing", username);
+    //   } else {
+    //     socket.emit("not_typing", username);
+    //   }
+    // };
+    
+
+ useEffect(() => {
+
+      socket.on("typing", (room, username) => {
+
+        if (!typingUsers.includes(room)) {
+
+          setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room, username]);
+
+           
+
         }
+
         setIsTyping(true);
+
          
+
       });
-  
-      socket.on("not_typing", (username) => {
+
+ 
+
+      socket.on("not_typing", (room) => {
+
         setTypingUsers((prevTypingUsers) =>
-          prevTypingUsers.filter((user) => user !== username)
+
+          prevTypingUsers.filter((user) => user !== room)
+
         );    
+
         console.log(setIsTyping)
+
         if (typingUsers.length === 0) {
+
           setIsTyping(false);
+
            
+
         }
+
       });
-  
+
+ 
+
       return () => {
+
         socket.off("receive_message");
+
         socket.off("typing");
+
         socket.off("not_typing");
+
          
+
       };
-    }, [isTyping, typingUsers]);
-  
+
+    }, [isTyping, room, typingUsers]);
+
+ 
+
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+
       const inputMessage = event.target.value;
+
       setCurrentMessage(inputMessage);
-  
+
+   
+
       if (inputMessage.trim() !== "") {
-        socket.emit("typing", username);
+
+        socket.emit("typing", username, room); // Send room information
+
       } else {
-        socket.emit("not_typing", username);
+
+        socket.emit("not_typing",username, room); // Send room information
+
       }
+
     };
 
     const joinRoom = () => {
@@ -230,14 +309,14 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       let messageData: messageData;
       if (currentMessage.match("/gif")) {
        
-         await fetchGif();
+         const url= await fetchGif();
         
         
         // const gifUrl = currentMessage.slice(5); // Assuming the gif URL is provided after "/gif "
         messageData = {
           room: room,
           author: username, // Use the current user's username as the author
-          message: gif,
+          message: url,
           time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
         };
       } else {
@@ -258,9 +337,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   
 
   useEffect(() => {
-      socket.on("receiveGif", (gifUrl) => {
-      setGif(gifUrl);
-   });
+    //   // socket.on("receiveGif", (gifUrl) => {
+    //   // setGif(gifUrl);
+    // });
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
@@ -290,16 +369,17 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           const data = await response.json();
           const gifUrl = data.data.images.downsized.url;
           // setGif(data.data.images.downsized.url);
-           setGif(gifUrl);
+          //  setGif(gifUrl);
           
           console.log(data);
           console.log(data.data.images.downsized.url);
          
-           socket.emit("sendGif", gifUrl);
+          //  socket.emit("sendGif", gifUrl);
 
           // socket.on("receiveGif", (gifUrl) => {
           //     setGif(gifUrl);
               
+              return gifUrl
               
           // });
          

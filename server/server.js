@@ -51,20 +51,31 @@ io.on("connection", (socket) => {
           console.log("active rooms: ", activeRooms);
     })
 
-socket.on("send_message", (data) => {
+  socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
 
 
-  socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-    console.log({username},"is typing");
-  });
+  // socket.on("typing", (username) => {
+  //   socket.broadcast.emit("typing", username);
+  //   console.log({username},"is typing");
+  // });
   
-  socket.on("not_typing", (username) => {
-    socketbroadcast.emit("not_typing", username);
+  // socket.on("not_typing", (username) => {
+  //   socket.broadcast.emit("not_typing", username);
+  // });
+  socket.on("typing", (username) => {
+
+    socket.to(socket.currentRoom).emit("typing", username); // Use socket.username
+
   });
+  socket.on("not_typing", (username) => {
+     socket.to(socket.currentRoom).emit("not_typing", username); // Use socket.username
+
+  });
+
+ 
 
 
   // socket.on("users_in_room", (users)=>{
@@ -106,25 +117,25 @@ socket.on("send_message", (data) => {
     console.log("User Disconnected", socket.id);
     console.log("active rooms after disconnect: ", activeRooms);
   });
-  socket.on("typing", (username) => {
-    socket.broadcast.emit("typing", username);
-  });
+  // socket.on("typing", (username) => {
+  //   socket.broadcast.emit("typing", username);
+  // });
   
-  socket.on("not_typing", (username) => {
-    socket.broadcast.emit("not_typing", username);
-  });
+  // socket.on("not_typing", (username) => {
+  //   socket.broadcast.emit("not_typing", username);
+  // });
 
 
   // socket.on("users_in_room", (users)=>{
   //   socket.broadcast.emit("users_in_room",users)
   // })
 
-  socket.on("sendGif", (gifUrl) => {
-    console.log("user sent gif :", gifUrl);
-    // Broadcast the GIF data to all connected clients
-    io.emit("receiveGif", gifUrl);
-    console.log("user recieved gif :", gifUrl);
-});
+//   socket.on("sendGif", (gifUrl) => {
+//     console.log("user sent gif :", gifUrl);
+//     // Broadcast the GIF data to all connected clients
+//     io.emit("receiveGif", gifUrl);
+//     console.log("user recieved gif :", gifUrl);
+// });
 
 })
   
