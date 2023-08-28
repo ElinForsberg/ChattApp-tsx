@@ -57,23 +57,17 @@ io.on("connection", (socket) => {
   });
 
 
-  // socket.on("typing", (username) => {
-  //   socket.broadcast.emit("typing", username);
-  //   console.log({username},"is typing");
-  // });
-  
-  // socket.on("not_typing", (username) => {
-  //   socket.broadcast.emit("not_typing", username);
-  // });
+//Sends user is typing in the same room as the writer
   socket.on("typing", (username) => {
-
-    socket.to(socket.currentRoom).emit("typing", username); // Use socket.username
+    socket.to(socket.currentRoom).emit("typing", username); 
 
   });
   socket.on("not_typing", (username) => {
-     socket.to(socket.currentRoom).emit("not_typing", username); // Use socket.username
+
+     socket.to(socket.currentRoom).emit("not_typing", username); 
 
   });
+  
 
  
 
@@ -117,13 +111,7 @@ io.on("connection", (socket) => {
     console.log("User Disconnected", socket.id);
     console.log("active rooms after disconnect: ", activeRooms);
   });
-  // socket.on("typing", (username) => {
-  //   socket.broadcast.emit("typing", username);
-  // });
-  
-  // socket.on("not_typing", (username) => {
-  //   socket.broadcast.emit("not_typing", username);
-  // });
+
 
 
   // socket.on("users_in_room", (users)=>{
