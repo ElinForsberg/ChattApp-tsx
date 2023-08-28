@@ -145,9 +145,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   }, [isTyping]);
 
   useEffect(() => {
-    socket.on("typing", (room, username) => {
+    socket.on("typing", (room) => {
       if (!typingUsers.includes(room)) {
-        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room, username]);
+        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room]);
          
       }
       setIsTyping(true);
