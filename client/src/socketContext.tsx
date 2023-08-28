@@ -151,7 +151,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
          
       }
       setIsTyping(true);
-       
+
     });
 
     socket.on("not_typing", (room) => {
@@ -163,6 +163,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         setIsTyping(false);
          
       }
+
     });
 
     return () => {
@@ -182,6 +183,18 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     } else {
       socket.emit("not_typing",username, room); // Send room information
     }
+          const lastTypingTime = new Date().getTime();
+    const timerLength = 3000;
+
+    setTimeout(() => {
+      const timeNow = new Date().getTime();
+      const timeDiff = timeNow - lastTypingTime;
+
+      if(timeDiff >= timerLength && typingUsers){
+        socket.emit("not_typing",username);
+        setIsTyping(false)
+      }
+    },timerLength);
   };
   
     
@@ -255,6 +268,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
+      setIsTyping(false)
     }
   };
   
