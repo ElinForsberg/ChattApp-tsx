@@ -76,21 +76,7 @@ function Chat() {
               </p>
             )}
           </div>
-          {/* <div className="feedback">
-    {room === "lobby" && isTyping && typingUsers.length > 0 && (
-      <p>
-        {typingUsers.length === 1 ? (
-          <>
-            {typingUsers[0]} is typing now...
-          </>
-        ) : (
-          <>
-            {typingUsers.slice(0, -1).join(", ")} and {typingUsers.slice(-1)} are typing now...
-          </>
-        )}
-      </p>
-    )}
-  </div> */}
+          
           {messageList.map((messageContent, index) => {
             
             return (
@@ -102,11 +88,7 @@ function Chat() {
                 
 
                   <div>
-                    {/* <div className="message-content">
-                        
-                      <p>{messageContent.message}</p>
-                      <img src={gif} width="100px"/>
-                    </div> */}
+                
                     
                     {messageContent.message.startsWith("https://media") ? (
                     <img id="gif-content"src={messageContent.message} alt="gif" width="150px" />
@@ -127,9 +109,7 @@ function Chat() {
                 </div>
               );
             })}
-             {/* <div className="gif">
-                
-        </div> */}
+            
           </div>
         </div>
 

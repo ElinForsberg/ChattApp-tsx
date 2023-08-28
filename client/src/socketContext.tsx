@@ -75,7 +75,7 @@ const defaultValues = {
 
 const SocketContext = createContext<ISocketContext>(defaultValues);
 
-// eslint-disable-next-line react-refresh/only-export-components
+
 export const useSocket = () => useContext(SocketContext);
 
 const socket = io("http://localhost:3000", { autoConnect: false });
@@ -94,17 +94,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [gif, setGif] = useState<string>("");
     const [sendGif, setSendGif ]= useState<string>("");
     
-    // const [showChat, setShowChat] = useState(false);
-  
-    //knappen lämna rum 
-  //   const leaveRoom = () => {
-  //   if (room !== "lobby") {
-  //     socket.emit("leave_room");
-  //     setRoom("lobby");
-  //     setMessageList([]); // Tömmer meddelandelistan när man lämnar rummet
-  //   }
-  // };
-
+    
   const leaveRoom = () => {
     if (room !== "lobby") {
       const roomSize = usersInRoom.length; // Antal användare i aktuellt rum
@@ -211,24 +201,8 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     });
   }, []);
 
-  // const sendMessage = async () => {
-  //   if (currentMessage !== "") {
-  //     const messageData = {
-  //       room: room,
-  //       author: username,
-  //       message: currentMessage,
-  //       time:
-  //         new Date(Date.now()).getHours() +
-  //         ":" +
-  //         new Date(Date.now()).getMinutes(),
-  //     };
-
-  //     await socket.emit("send_message", messageData);
-  //     setMessageList((list) => [...list, messageData]);
-  //     setCurrentMessage("");
-  //     setIsTyping(false)
-  //   }
-  // };
+  
+  
   const sendMessage = async () => {
     if (currentMessage !== "") {
       let messageData: messageData;
@@ -237,7 +211,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
          const url= await fetchGif();
         
         
-        // const gifUrl = currentMessage.slice(5); // Assuming the gif URL is provided after "/gif "
+        
         messageData = {
           room: room,
           author: username, // Use the current user's username as the author
@@ -262,16 +236,12 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   
 
   useEffect(() => {
-    //   // socket.on("receiveGif", (gifUrl) => {
-    //   // setGif(gifUrl);
-    // });
+   
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
     
-  //   socket.on("receiveGif", (gifUrl) => {
-  //     setGif(gifUrl);
-  // });
+  
   }, []);
   
   
@@ -293,22 +263,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           const response = await fetch(giphyUrl);
           const data = await response.json();
           const gifUrl = data.data.images.downsized.url;
-          // setGif(data.data.images.downsized.url);
-          //  setGif(gifUrl);
-          
-          console.log(data);
-          console.log(data.data.images.downsized.url);
          
-          //  socket.emit("sendGif", gifUrl);
-
-          // socket.on("receiveGif", (gifUrl) => {
-          //     setGif(gifUrl);
-              
               return gifUrl
-              
-          // });
-         
-          
+                   
       } catch (error) {
           console.log(error);
           
