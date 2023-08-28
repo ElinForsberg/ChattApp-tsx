@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
+import { PropsWithChildren, SetStateAction, createContext, useContext, useEffect, useState } from "react";
 
 import { io } from "socket.io-client";
 
@@ -230,9 +230,8 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       let messageData: messageData;
       if (currentMessage.match("/gif")) {
        
-        fetchGif();
-       
-        // setSendGif(gif);
+         await fetchGif();
+        
         
         // const gifUrl = currentMessage.slice(5); // Assuming the gif URL is provided after "/gif "
         messageData = {
@@ -283,7 +282,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         };
     }, []);
    
-    const fetchGif = async () => {
+    const fetchGif = async ()=>  {
       try {
           
           const giphyUrl = "https://api.giphy.com/v1/gifs/random?api_key=lwMa3B9QFK1Z9GZRQu1iZkhRWkiQoZXp&tag=&rating=g";
