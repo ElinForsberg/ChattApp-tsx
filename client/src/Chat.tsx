@@ -73,7 +73,7 @@ function Chat() {
   {isTyping && typingUsers.length > 0 && (
     <p>
       {typingUsers.join(", ")}{" "}
-      {typingUsers.length === 1 ? "is" : "are"} typing now...
+      {typingUsers.length === 1 ? "skriver" : ""} ...
     </p>
   )}
 </div>
