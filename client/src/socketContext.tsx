@@ -136,13 +136,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   }, [isTyping]);
 
   useEffect(() => {
-    socket.on("typing", (room, username) => {
+    socket.on("typing", (room) => {
       if (!typingUsers.includes(room)) {
-        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room, username]);
+        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room]);
          
       }
       setIsTyping(true);
-       
+
     });
 
     socket.on("not_typing", (room) => {
@@ -154,6 +154,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         setIsTyping(false);
          
       }
+
     });
 
     return () => {
@@ -174,6 +175,18 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     } else {
       socket.emit("not_typing",username, room); // Send room information
     }
+          const lastTypingTime = new Date().getTime();
+    const timerLength = 3000;
+
+    setTimeout(() => {
+      const timeNow = new Date().getTime();
+      const timeDiff = timeNow - lastTypingTime;
+
+      if(timeDiff >= timerLength && typingUsers){
+        socket.emit("not_typing",username);
+        setIsTyping(false)
+      }
+    },timerLength);
   };
   
     
@@ -231,6 +244,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
+      setIsTyping(false)
     }
   };
   
