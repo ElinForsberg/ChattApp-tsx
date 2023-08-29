@@ -13,28 +13,7 @@ const io = new Server(server, {
 
 app.use(cors());
 
-
-function roomsHandler() {
-  let activeRooms = [];
-  let usersById = [];
-
-  const rooms = io.sockets.adapter.rooms;
-  console.log("rooms by MAP: ", io.sockets.adapter.rooms);
-
-  for (const [key, value] of rooms) {
-    if (
-      key !== value &&
-      !(value.size === 1 && value.has(key)) &&
-      !activeRooms.includes(key)
-    ) {
-      activeRooms.push(key);
-    }
-  }
-    if (!activeRooms.includes("lobby")) {
-      activeRooms.push("lobby");
-    }
-    return { activeRooms };
-}
+let newUser = [];
 
 
 
@@ -42,8 +21,12 @@ function roomsHandler() {
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
-    socket.on("join_room", (room) => {
+    const username = socket.handshake.auth.username;
+    // console.log(user);
 
+    socket.on("join_room", (room) => {
+      // const user = username;
+      
         if (socket.currentRoom) {
             socket.leave(socket.currentRoom);
             console.log(`User left room: ${socket.currentRoom}`);
@@ -52,8 +35,19 @@ io.on("connection", (socket) => {
           socket.join(room);
           socket.currentRoom = room; 
 
-          const { activeRooms }= roomsHandler();
+          const newUserInfo = {
+
+            id: socket.id,
+      
+            username: username,
+      
+          };
+      
+          newUser.push(newUserInfo);
+
+          const { activeRooms, usersInRoom  }= roomsHandler();
           io.emit("active_rooms", activeRooms);
+          io.emit("users_in_room", usersInRoom);
           console.log("från join",activeRooms);
           
     })
@@ -79,8 +73,9 @@ io.on("connection", (socket) => {
     if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
       socket.leave(socket.currentRoom); //
       console.log(`User left room: ${socket.currentRoom}`);
-      const { activeRooms }  = roomsHandler();
+      const { activeRooms, usersInRoom }  = roomsHandler();
       io.emit("active_rooms", activeRooms);
+      io.emit("users_in_room", usersInRoom);
       socket.currentRoom = null;
     }
   });
@@ -88,13 +83,73 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     // Ta bort användarens socket från rummet
     socket.leave("lobby");
-    const { activeRooms } = roomsHandler();
+    const { activeRooms, usersInRoom } = roomsHandler();
     io.emit("active_rooms", activeRooms);
+    io.emit("users_in_room", usersInRoom);
   });
 
 
 })
   
+
+function roomsHandler() {
+  let activeRooms = [];
+  let usersInRoom = [];
+
+  const rooms = io.sockets.adapter.rooms;
+  console.log("rooms by MAP: ", io.sockets.adapter.rooms);
+
+  for (const [key, value] of rooms) {
+    if (
+      key !== value &&
+      !(value.size === 1 && value.has(key)) &&
+      !activeRooms.includes(key)
+    ) {
+      activeRooms.push(key);
+
+      //CREATE ARRAY OF USERS IDs FROM SOCKET ADAPTER
+
+      const usersIdArray = Array.from(value);
+
+ 
+
+      // CONVERT IDS TO USERNAMES
+
+      const usernamesArray = usersIdArray.map((userId) => {
+
+        const foundUser = newUser.find((user) => user.id === userId);
+
+        return foundUser ? foundUser.username : userId;
+
+      });
+
+ 
+
+      //ADD ID ARRAY TO USERS IN ROOM
+
+      usersInRoom.push({
+
+        roomName: key,
+
+        usernames: usernamesArray,
+
+      });
+
+ 
+
+      console.log("LOG -- USERS IN ROOM: ", usersInRoom); 
+    }
+  }
+
+
+
+
+
+    if (!activeRooms.includes("lobby")) {
+      activeRooms.push("lobby");
+    }
+    return { activeRooms, usersInRoom };
+}
 
 
 

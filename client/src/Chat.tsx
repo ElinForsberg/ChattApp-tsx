@@ -18,6 +18,7 @@ function Chat() {
     handleInput,
     usersInRoom,
     roomsList,
+    userList,
 
     setMessageList, 
 
@@ -45,17 +46,17 @@ function Chat() {
 
                 {activeRoom}
                 </li>
-
+              
             ))}
           </ul>
-                   <ul>
-                    {usersInRoom.map((user) => (
-                      <div>
-                        <li key={user}>{user}</li>
-                        </div>
-                    ))}
-                    
-                </ul>
+          
+                {/* <ul>
+                  {(
+                    userList.find((usersInRoom) => usersInRoom.roomsList === room)
+                  )}
+                   
+                </ul> */}
+
         </div>
       <div className="chat">
       <div className="chat-container">

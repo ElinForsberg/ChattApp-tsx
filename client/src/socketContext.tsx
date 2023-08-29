@@ -25,6 +25,8 @@ interface ISocketContext {
    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
    usersInRoom: string[]  
    fetchGif: () => void
+   userList: userData[];
+   setUserList: React.Dispatch<React.SetStateAction<userData[]>>;
    
 }
 
@@ -34,6 +36,11 @@ interface messageData {
   message: string;
   time: string;
   
+}
+
+interface userData {
+  room:string,
+  username: string
 }
 
 const defaultValues = {
@@ -59,7 +66,9 @@ const defaultValues = {
   isTyping: false,  // Added isTyping to the context value
   handleInput: () => {},
   usersInRoom:[],
-  fetchGif: () => {}
+  fetchGif: () => {},
+  userList: [],
+  setUserList: () => []
   
 };
 
@@ -82,6 +91,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [isTyping, setIsTyping] = useState(false);
     const [usersInRoom] = useState<string[]>([]);
     const [roomsList, setRoomsList] = useState<string[]>([]);
+    const [userList, setUserList] = useState<userData[]>([]);
   
     
     
@@ -111,6 +121,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
 
   const login = () => {
     socket.connect();
+    socket.auth = { username };
     setIsLoggedIn(true);
     setRoom("lobby");
     console.log(username);
@@ -118,8 +129,22 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
   useEffect(() => {
     socket.on("active_rooms", function (activeRooms) {
+      
+      
       setRoomsList(activeRooms);
-      console.log("roomsList");
+      
+      
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("users_in_room", function (data) {
+      console.log(data);
+      
+      setUserList((list) => [...list, data]);
+      console.log(userList);
+      
+      
       
     });
   }, []);
@@ -286,7 +311,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         isTyping,
         handleInput,
         usersInRoom,
-        fetchGif
+        fetchGif,
+        userList,
+        setUserList
       }}
     >
       {children}
