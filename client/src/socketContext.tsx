@@ -23,14 +23,9 @@ interface ISocketContext {
    typingUsers: string[], // Added typingUsers to the context value
    isTyping: boolean, // Added isTyping to the context value
    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-   usersInRoom: string[]
-   gif: string;
-   setGif: React.Dispatch<React.SetStateAction<string>>
+   usersInRoom: string[]  
    fetchGif: () => void
-   sendGif: string;
-   setSendGif: React.Dispatch<React.SetStateAction<string>>
    
-
 }
 
 interface messageData {
@@ -64,12 +59,8 @@ const defaultValues = {
   isTyping: false,  // Added isTyping to the context value
   handleInput: () => {},
   usersInRoom:[],
-  gif: "",
-  setGif: () => {},
-  fetchGif: () => {},
-  sendGif: "",
-  setSendGif: () => {}
-    
+  fetchGif: () => {}
+  
 };
 
 
@@ -89,10 +80,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [currentRoom, setCurrentRoom] = useState("");
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const [isTyping, setIsTyping] = useState(false);
-    const [usersInRoom, setUsersInRoom] = useState<string[]>([]);
+    const [usersInRoom] = useState<string[]>([]);
     const [roomsList, setRoomsList] = useState<string[]>([]);
-    const [gif, setGif] = useState<string>("");
-    const [sendGif, setSendGif ]= useState<string>("");
+  
     
     
   const leaveRoom = () => {
@@ -126,7 +116,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     console.log(username);
   };
     
+  useEffect(() => {
+    socket.on("active_rooms", function (activeRooms) {
+      setRoomsList(activeRooms);
+      console.log("roomsList");
       
+    });
+  }, []);
 
   useEffect(() => {
     socket.on("receive_message", (data) => {
@@ -196,23 +192,12 @@ const SocketProvider = ({children}: PropsWithChildren) => {
             setRoom(currentRoom);
             socket.emit("join_room", room, username);
             setMessageList([]);
-            const updatedUsersInRoom = [...usersInRoom, username]; // Add current user's username
-            setUsersInRoom(updatedUsersInRoom); // Update the local state
-    
-            socket.emit("users_in_room", updatedUsersInRoom); // Emit the updated list of users
-            // setShowChat(true);
             
-            console.log(room);
-            console.log(usersInRoom)
             
           }
     }
 
-  useEffect(() => {
-    socket.on("activeRooms", function (activeRooms) {
-      setRoomsList(activeRooms);
-    });
-  }, []);
+  
 
   
   
@@ -258,17 +243,6 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   
   }, []);
   
-  
-        
-     useEffect(() => {
-     socket.on("users_in_room", (users) => {
-            setUsersInRoom(users);
-        });
-
-        return () => {
-            socket.off("users_in_room");
-        };
-    }, []);
    
     const fetchGif = async ()=>  {
       try {
@@ -312,11 +286,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
         isTyping,
         handleInput,
         usersInRoom,
-        gif,
-        setGif,
-        fetchGif,
-        sendGif,
-        setSendGif
+        fetchGif
       }}
     >
       {children}
