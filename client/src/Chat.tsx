@@ -18,10 +18,9 @@ function Chat() {
     handleInput,
     usersInRoom,
     roomsList,
-    setMessageList,
-   /* gif,
-    setGif,
-    fetchGif*/
+
+    setMessageList, 
+
   } = useSocket()
     
     return (
@@ -69,6 +68,7 @@ function Chat() {
         <div className="chat-body">
 
         <div className="message-container">
+
         <div className="feedback">
   {isTyping && typingUsers.length > 0 && (
     <p>
@@ -77,6 +77,7 @@ function Chat() {
     </p>
   )}
 </div>
+
           {messageList.map((messageContent, index) => {
             
             return (
@@ -88,11 +89,7 @@ function Chat() {
                 
 
                   <div>
-                    {/* <div className="message-content">
-                        
-                      <p>{messageContent.message}</p>
-                      <img src={gif} width="100px"/>
-                    </div> */}
+                
                     
                     {messageContent.message.startsWith("https://media") ? (
                     <img id="gif-content"src={messageContent.message} alt="gif" width="150px" />
@@ -113,9 +110,7 @@ function Chat() {
                 </div>
               );
             })}
-             {/* <div className="gif">
-                
-        </div> */}
+            
           </div>
         </div>
 

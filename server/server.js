@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
             users.push(username);
             console.log("användare till lista",users);
           }
-          // io.sockets.emit('activeRooms', activeRooms);
+          
 
           activeRooms = activeRooms.filter(room => {
             if (room === "lobby") {
@@ -51,28 +51,23 @@ io.on("connection", (socket) => {
           console.log("active rooms: ", activeRooms);
     })
 
-socket.on("send_message", (data) => {
+  socket.on("send_message", (data) => {
     socket.to(data.room).emit("receive_message", data);
     console.log(data);
   });
 
+
 //Sends user is typing in the same room as the writer
   socket.on("typing", (username) => {
     socket.to(socket.currentRoom).emit("typing", username); 
+
   });
-  
   socket.on("not_typing", (username) => {
-    socket.to(socket.currentRoom).emit("not_typing", username);
+
+     socket.to(socket.currentRoom).emit("not_typing", username); 
+
   });
   
-
-
-  // socket.on("users_in_room", (users)=>{
-  //   socket.broadcast.emit("users_in_room",users)
-  // })
-
-
-
   socket.on("leave_room", () => {
     if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn
       socket.leave(socket.currentRoom); //
@@ -113,12 +108,7 @@ socket.on("send_message", (data) => {
   //   socket.broadcast.emit("users_in_room",users)
   // })
 
-  socket.on("sendGif", (gifUrl) => {
-    console.log("user sent gif :", gifUrl);
-    // Broadcast the GIF data to all connected clients
-    io.emit("receiveGif", gifUrl);
-    console.log("user recieved gif :", gifUrl);
-});
+
 
 })
   
