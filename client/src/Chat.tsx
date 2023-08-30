@@ -53,6 +53,7 @@ function Chat() {
           </div>
 
 
+
           <div className="chat">
             <div className="chat-container">
               <h2>Du är inloggad som: {username}</h2><br />
@@ -69,10 +70,11 @@ function Chat() {
                 {isTyping && typingUsers.length > 0 && (
                 <p>
                 {typingUsers.join(", ")}{" "}
-                {typingUsers.length === 1 ? "is" : "are"} typing now...
+                {typingUsers.length === 1 ? "skriver" : ""} ...
                 </p>
                 )}
           </div>
+
 
           {messageList.map((messageContent, index) => {
             
