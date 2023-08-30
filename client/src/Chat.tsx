@@ -34,6 +34,7 @@ function Chat() {
             <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
             <p className='active-rooms-list'>Alla aktiva rum: </p>
           
+
         <ul className="roomsList">
   {roomsList.map((activeRoom) => (
     <li
@@ -56,7 +57,6 @@ function Chat() {
     </li>
   ))}
 </ul>
-
 
 
         </div>
