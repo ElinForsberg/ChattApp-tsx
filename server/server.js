@@ -15,18 +15,12 @@ app.use(cors());
 
 let newUser = [];
 
-
-
-
 io.on("connection", (socket) => {
     console.log("New user connected: ", socket.id);
 
     const username = socket.handshake.auth.username;
-    // console.log(user);
-
-    socket.on("join_room", (room) => {
-      // const user = username;
-      
+    
+    socket.on("join_room", (room) => { 
         if (socket.currentRoom) {
             socket.leave(socket.currentRoom);
             console.log(`User left room: ${socket.currentRoom}`);
@@ -36,11 +30,8 @@ io.on("connection", (socket) => {
           socket.currentRoom = room; 
 
           const newUserInfo = {
-
             id: socket.id,
-      
             username: username,
-      
           };
       
           newUser.push(newUserInfo);
@@ -48,8 +39,7 @@ io.on("connection", (socket) => {
           const { activeRooms, usersInRoom  }= roomsHandler();
           io.emit("active_rooms", activeRooms);
           io.emit("users_in_room", usersInRoom);
-          console.log("från join",activeRooms);
-          
+          console.log("från join",activeRooms);     
     })
 
   socket.on("send_message", (data) => {
@@ -57,15 +47,12 @@ io.on("connection", (socket) => {
     console.log(data);
   });
 
-
-//Sends user is typing in the same room as the writer
   socket.on("typing", (username) => {
     socket.to(socket.currentRoom).emit("typing", username); 
-
   });
-  socket.on("not_typing", (username) => {
 
-     socket.to(socket.currentRoom).emit("not_typing", username); 
+  socket.on("not_typing", (username) => {
+  socket.to(socket.currentRoom).emit("not_typing", username); 
 
   });
   
@@ -87,11 +74,8 @@ io.on("connection", (socket) => {
     io.emit("active_rooms", activeRooms);
     io.emit("users_in_room", usersInRoom);
   });
-
-
 })
   
-
 function roomsHandler() {
   let activeRooms = [];
   let usersInRoom = [];
@@ -107,51 +91,26 @@ function roomsHandler() {
     ) {
       activeRooms.push(key);
 
-      //CREATE ARRAY OF USERS IDs FROM SOCKET ADAPTER
-
-      const usersIdArray = Array.from(value);
-
- 
-
-      // CONVERT IDS TO USERNAMES
-
+      
+      const usersIdArray = Array.from(value);  //skapar array från userId
+      // id till användarnamn
       const usernamesArray = usersIdArray.map((userId) => {
-
-        const foundUser = newUser.find((user) => user.id === userId);
-
+      const foundUser = newUser.find((user) => user.id === userId);
         return foundUser ? foundUser.username : userId;
-
       });
-
- 
-
-      //ADD ID ARRAY TO USERS IN ROOM
-
+      //skickar id array till usersInRoom
       usersInRoom.push({
-
         roomName: key,
-
         usernames: usernamesArray,
-
       });
-
- 
-
-      console.log("LOG -- USERS IN ROOM: ", usersInRoom); 
     }
   }
-
-
-
-
 
     if (!activeRooms.includes("lobby")) {
       activeRooms.push("lobby");
     }
     return { activeRooms, usersInRoom };
 }
-
-
 
 server.listen(3000, () => console.log("Server is up and running"));
 

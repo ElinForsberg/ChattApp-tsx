@@ -10,7 +10,7 @@ interface ISocketContext {
   setRoom: React.Dispatch<React.SetStateAction<string>>;
   login: () => void;
   joinRoom: () => void;
-  leaveRoom: () => void; // Lämna rum 
+  leaveRoom: () => void; 
   currentMessage: string;
   setCurrentMessage: React.Dispatch<React.SetStateAction<string>>;
   messageList: messageData[];
@@ -20,14 +20,13 @@ interface ISocketContext {
   setCurrentRoom: React.Dispatch<React.SetStateAction<string>>;
   roomsList: string[];
   setRoomsList: React.Dispatch<React.SetStateAction<string[]>>;
-   typingUsers: string[], // Added typingUsers to the context value
-   isTyping: boolean, // Added isTyping to the context value
+   typingUsers: string[];
+   isTyping: boolean;
    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
-   usersInRoom: string[]  
-   fetchGif: () => void
+   usersInRoom: string[];  
+   fetchGif: () => void;
    userList: userData[];
-   setUserList: React.Dispatch<React.SetStateAction<userData[]>>;
-   
+   setUserList: React.Dispatch<React.SetStateAction<userData[]>>;   
 }
 
 interface messageData {
@@ -35,17 +34,14 @@ interface messageData {
   author: string;
   message: string;
   time: string;
-  
 }
 
 interface userData {
   roomName: string;
-  // room: string;
   usernames: string[];
 }
 
 const defaultValues = {
-
   username: "",
   setUsername: () => {},
   room: "",
@@ -53,7 +49,7 @@ const defaultValues = {
   isLoggedIn: false,
   login: () => {},
   joinRoom: () => {},
-  leaveRoom: () => {}, // lämna rum 
+  leaveRoom: () => {}, 
   currentMessage: "",
   setCurrentMessage: () => {},
   messageList: [],
@@ -63,26 +59,23 @@ const defaultValues = {
   setCurrentRoom: () => {},
   roomsList: [],
   setRoomsList: () => [],
-  typingUsers: [], // Initialize as an empty array
-  isTyping: false,  // Added isTyping to the context value
+  typingUsers: [], 
+  isTyping: false,  
   handleInput: () => {},
   usersInRoom:[],
   fetchGif: () => {},
   userList: [],
   setUserList: () => []
-  
 };
 
-
 const SocketContext = createContext<ISocketContext>(defaultValues);
-
 
 export const useSocket = () => useContext(SocketContext);
 
 const socket = io("http://localhost:3000", { autoConnect: false });
 
 const SocketProvider = ({children}: PropsWithChildren) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState<string>("");
     const [room, setRoom] = useState("");
     const [currentMessage, setCurrentMessage] = useState("");
@@ -94,8 +87,6 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [roomsList, setRoomsList] = useState<string[]>([]);
     const [userList, setUserList] = useState<userData[]>([]);
   
-    
-    
   const leaveRoom = () => {
     if (room !== "lobby") {
       const roomSize = usersInRoom.length; // Antal användare i aktuellt rum
@@ -111,9 +102,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       }
     }
   };
-  
-
-    
+   
  useEffect(() => {
     if (room) {
       socket.emit("join_room", room);
@@ -130,19 +119,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
   useEffect(() => {
     socket.on("active_rooms", function (activeRooms) {
-     
-      
-      setRoomsList(activeRooms);
-      
-      
+      setRoomsList(activeRooms);  
     });
   }, []);
 
   useEffect(() => {
     socket.on("users_in_room", function (data) {
-      setUserList(data)
-
-      
+      setUserList(data)  
     });
   }, []);
 
@@ -156,11 +139,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   useEffect(() => {
     socket.on("typing", (room) => {
       if (!typingUsers.includes(room)) {
-        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room]);
-         
+        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room]);     
       }
       setIsTyping(true);
-
     });
 
     socket.on("not_typing", (room) => {
@@ -170,17 +151,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       console.log(setIsTyping)
       if (typingUsers.length === 0) {
         setIsTyping(false);
-         
       }
-
     });
 
     return () => {
       socket.off("receive_message");
       socket.off("typing");
       socket.off("not_typing");
-       
-
     };
   }, [isTyping, room, typingUsers]);
 
@@ -206,32 +183,21 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       }
     },timerLength);
   };
-  
-    
 
     const joinRoom = () => {
         if ( room !== "") {
             setRoom(currentRoom);
             socket.emit("join_room", room, username);
-            setMessageList([]);
-            
-            
+            setMessageList([]);        
           }
     }
 
-  
-
-  
-  
   const sendMessage = async () => {
     if (currentMessage !== "") {
       let messageData: messageData;
       if (currentMessage.match("/gif")) {
-       
          const url= await fetchGif();
-        
-        
-        
+         
         messageData = {
           room: room,
           author: username, // Use the current user's username as the author
@@ -246,26 +212,19 @@ const SocketProvider = ({children}: PropsWithChildren) => {
           time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
         };
       }
-      
       await socket.emit("send_message", messageData);
-      
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
       setIsTyping(false)
     }
   };
   
-
   useEffect(() => {
-   
-    socket.on("receive_message", (data) => {
+   socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-    
-  
   }, []);
   
-   
     const fetchGif = async ()=>  {
       try {
           
@@ -277,12 +236,9 @@ const SocketProvider = ({children}: PropsWithChildren) => {
               return gifUrl
                    
       } catch (error) {
-          console.log(error);
-          
+          console.log(error);   
       }
   };
-  
-  
 
   return (
     <SocketContext.Provider
