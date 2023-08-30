@@ -49,10 +49,29 @@ border-radius: 5px;
     font-size: 20px;
 }
 
-.roomsList{
-    font-size: 18px;
-}
+/* Styling för rumlistan */
+.roomsList {
+    padding: 0;
+  }
+  
+  .roomsList li {
+    padding: 10px;
+  }
+  
+  .roomsList li:hover {
+    background-color: #f5f5f5;
+  }
+  
 
+  .activeRoom {
+    font-size: 20px;
+  }
+  
+  .user {
+    margin: 2px 0;
+    font-size: 12px;
+  }
+  
 .chat {
     width: 100vw;
     display: flex;

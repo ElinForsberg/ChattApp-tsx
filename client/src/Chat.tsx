@@ -34,22 +34,30 @@ function Chat() {
         <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
         <p className='active-rooms-list'>Alla aktiva rum: </p>
           
-          <ul>
+        <ul className="roomsList">
   {roomsList.map((activeRoom) => (
-    <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => { setRoom(activeRoom); setMessageList([]); }}>
-      {activeRoom}
-      <ul>
+    <li
+      key={activeRoom}
+      onClick={() => {
+        setRoom(activeRoom);
+        setMessageList([]);
+      }}
+    >
+      <span className="activeRoom">{activeRoom}</span>
+      <div className="user-list">
         {(
           userList.find((userData) => userData.roomName === activeRoom)?.usernames || []
         ).map((user) => (
-          <li key={user}>
+          <p key={user} className="user">
             {user}
-          </li>
+          </p>
         ))}
-      </ul>
+      </div>
     </li>
   ))}
 </ul>
+
+
 
         </div>
       <div className="chat">
