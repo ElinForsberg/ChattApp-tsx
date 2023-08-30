@@ -148,7 +148,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       setTypingUsers((prevTypingUsers) =>
         prevTypingUsers.filter((user) => user !== room)
       );    
-      console.log(setIsTyping)
+      
       if (typingUsers.length === 0) {
         setIsTyping(false);
       }
