@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
-
 import { io } from "socket.io-client";
+
 
 interface ISocketContext {
   isLoggedIn: boolean;
@@ -225,10 +225,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     });
   }, []);
   
+ 
+  
+
     const fetchGif = async ()=>  {
       try {
           
-          const giphyUrl = "https://api.giphy.com/v1/gifs/random?api_key=lwMa3B9QFK1Z9GZRQu1iZkhRWkiQoZXp&tag=&rating=g";
+          const giphyUrl = `https://api.giphy.com/v1/gifs/random?api_key=${import.meta.env.VITE_API_KEY}&tag=&rating=g`;
           const response = await fetch(giphyUrl);
           const data = await response.json();
           const gifUrl = data.data.images.downsized.url;

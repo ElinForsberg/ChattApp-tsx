@@ -42,7 +42,7 @@ function Chat() {
                   {(
                   userList.find((userData) => userData.roomName === activeRoom)?.usernames || []
                   ).map((user) => (
-                  <li key={user}>
+                  <li className="userList" key={user}>
                     {user}
                   </li>
                   ))}
