@@ -149,9 +149,10 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   useEffect(() => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
-      setIsTyping(false);      
+      setIsTyping(false);  
+      console.log(messageList)    
     });
-  }, [isTyping]);
+  }, [isTyping, messageList]);
 
   useEffect(() => {
     socket.on("typing", (room) => {
@@ -193,18 +194,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     } else {
       socket.emit("not_typing",username, room); // Send room information
     }
-          const lastTypingTime = new Date().getTime();
-    const timerLength = 3000;
-
-    setTimeout(() => {
-      const timeNow = new Date().getTime();
-      const timeDiff = timeNow - lastTypingTime;
-
-      if(timeDiff >= timerLength && typingUsers){
-        socket.emit("not_typing",username);
-        setIsTyping(false)
-      }
-    },timerLength);
+ 
   };
   
     
@@ -252,20 +242,10 @@ const SocketProvider = ({children}: PropsWithChildren) => {
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
       setIsTyping(false)
+      console.log(messageList) 
     }
   };
   
-
-  useEffect(() => {
-   
-    socket.on("receive_message", (data) => {
-      setMessageList((list) => [...list, data]);
-    });
-    
-  
-  }, []);
-  
-   
     const fetchGif = async ()=>  {
       try {
           
