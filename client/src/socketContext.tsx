@@ -39,8 +39,9 @@ interface messageData {
 }
 
 interface userData {
-  room:string,
-  username: string
+  roomName: string;
+  // room: string;
+  usernames: string[];
 }
 
 const defaultValues = {
@@ -129,7 +130,7 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     
   useEffect(() => {
     socket.on("active_rooms", function (activeRooms) {
-      
+     
       
       setRoomsList(activeRooms);
       
@@ -139,12 +140,8 @@ const SocketProvider = ({children}: PropsWithChildren) => {
 
   useEffect(() => {
     socket.on("users_in_room", function (data) {
-      console.log(data);
-      
-      setUserList((list) => [...list, data]);
-      console.log(userList);
-      
-      
+      setUserList(data)
+
       
     });
   }, []);

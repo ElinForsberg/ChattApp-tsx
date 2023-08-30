@@ -2,7 +2,6 @@
 import { useSocket } from './socketContext'
 import liveChatIcon from './assets/live-chat-icon-7417.png';
 
-
 function Chat() {
   const {leaveRoom,
     room, 
@@ -16,14 +15,11 @@ function Chat() {
     isTyping,
     typingUsers,
     handleInput,
-    usersInRoom,
     roomsList,
     userList,
-
     setMessageList, 
-
-  } = useSocket()
-    
+    } = useSocket()
+ 
     return (
       <div>
         <div className="container">
@@ -37,25 +33,23 @@ function Chat() {
    
         <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
         <p className='active-rooms-list'>Alla aktiva rum: </p>
-          <ul>
-            {roomsList.map((activeRoom) => (
-
-              
-
-              <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => {setRoom(activeRoom); setMessageList([]); }}>
-
-                {activeRoom}
-                </li>
-              
-            ))}
-          </ul>
           
-                {/* <ul>
-                  {(
-                    userList.find((usersInRoom) => usersInRoom.roomsList === room)
-                  )}
-                   
-                </ul> */}
+          <ul>
+  {roomsList.map((activeRoom) => (
+    <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => { setRoom(activeRoom); setMessageList([]); }}>
+      {activeRoom}
+      <ul>
+        {(
+          userList.find((userData) => userData.roomName === activeRoom)?.usernames || []
+        ).map((user) => (
+          <li key={user}>
+            {user}
+          </li>
+        ))}
+      </ul>
+    </li>
+  ))}
+</ul>
 
         </div>
       <div className="chat">
