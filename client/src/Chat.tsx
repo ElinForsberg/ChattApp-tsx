@@ -34,35 +34,43 @@ function Chat() {
             <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
             <p className='active-rooms-list'>Alla aktiva rum: </p>
           
-              <ul>
-                {roomsList.map((activeRoom) => (
-                <li className="roomsList" key={activeRoom} value={activeRoom} onClick={() => { setRoom(activeRoom); setMessageList([]); }}>
-                  {activeRoom}
-                <ul>
-                  {(
-                  userList.find((userData) => userData.roomName === activeRoom)?.usernames || []
-                  ).map((user) => (
-                  <li className="userList" key={user}>
-                    {user}
-                  </li>
-                  ))}
-                </ul>
-                </li>
-                ))}
-              </ul>
-          </div>
+
+        <ul className="roomsList">
+  {roomsList.map((activeRoom) => (
+    <li
+      key={activeRoom}
+      onClick={() => {
+        setRoom(activeRoom);
+        setMessageList([]);
+      }}
+    >
+      <span className="activeRoom">{activeRoom}</span>
+      <div className="user-list">
+        {(
+          userList.find((userData) => userData.roomName === activeRoom)?.usernames || []
+        ).map((user) => (
+          <p key={user} className="user">
+            {user}
+          </p>
+        ))}
+      </div>
+    </li>
+  ))}
+</ul>
 
 
+        </div>
+          
+      <div className="chat">
+      <div className="chat-container">
+      <h2>Du är inloggad som: {username}</h2><br />
+      <h2>Du är i rum: {room}</h2><br />
+    <div className="chat-window">
+      <div className="chat-header">
+        <p>Live Chat</p>
+        </div> 
+        <div className="chat-body">
 
-          <div className="chat">
-            <div className="chat-container">
-              <h2>Du är inloggad som: {username}</h2><br />
-              <h2>Du är i rum: {room}</h2><br />
-              <div className="chat-window">
-              <div className="chat-header">
-                <p>Live Chat</p>
-              </div> 
-              <div className="chat-body">
 
               <div className="message-container">
 
