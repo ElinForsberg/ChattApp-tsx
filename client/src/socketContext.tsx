@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
-
 import { io } from "socket.io-client";
+
 
 interface ISocketContext {
   isLoggedIn: boolean;
@@ -20,7 +20,7 @@ interface ISocketContext {
   setCurrentRoom: React.Dispatch<React.SetStateAction<string>>;
   roomsList: string[];
   setRoomsList: React.Dispatch<React.SetStateAction<string[]>>;
-   typingUsers: string[];
+   typingUsers: string;
    isTyping: boolean;
    handleInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
    usersInRoom: string[];  
@@ -59,7 +59,7 @@ const defaultValues = {
   setCurrentRoom: () => {},
   roomsList: [],
   setRoomsList: () => [],
-  typingUsers: [], 
+  typingUsers: "", 
   isTyping: false,  
   handleInput: () => {},
   usersInRoom:[],
@@ -81,7 +81,8 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     const [currentMessage, setCurrentMessage] = useState("");
     const [messageList, setMessageList] = useState<messageData[]>([]);
     const [currentRoom, setCurrentRoom] = useState("");
-    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    // const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const [typingUsers, setTypingUsers] = useState<string>("");
     const [isTyping, setIsTyping] = useState(false);
     const [usersInRoom] = useState<string[]>([]);
     const [roomsList, setRoomsList] = useState<string[]>([]);
@@ -137,52 +138,38 @@ const SocketProvider = ({children}: PropsWithChildren) => {
   }, [isTyping]);
 
   useEffect(() => {
-    socket.on("typing", (room) => {
-      if (!typingUsers.includes(room)) {
-        setTypingUsers((prevTypingUsers) => [...prevTypingUsers, room]);     
-      }
+    socket.on("typing", (username) => {
       setIsTyping(true);
+      setTypingUsers(username); // Set the typing user's username
     });
-
-    socket.on("not_typing", (room) => {
-      setTypingUsers((prevTypingUsers) =>
-        prevTypingUsers.filter((user) => user !== room)
-      );    
-      console.log(setIsTyping)
-      if (typingUsers.length === 0) {
-        setIsTyping(false);
-      }
+  
+    socket.on("not_typing", (username) => {
+      setTypingUsers(""); // Clear the typing user's username
+      setIsTyping(false);
     });
-
+  
     return () => {
-      socket.off("receive_message");
-      socket.off("typing");
-      socket.off("not_typing");
-    };
-  }, [isTyping, room, typingUsers]);
-
+          socket.off("receive_message");
+          socket.off("typing");
+          socket.off("not_typing");
+          console.log(typingUsers);
+          
+        };
+      }, [isTyping, room, typingUsers]);
+  
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputMessage = event.target.value;
     setCurrentMessage(inputMessage);
   
     if (inputMessage.trim() !== "") {
-      socket.emit("typing", username, room); // Send room information
+      socket.emit("typing", username); // Send the current user's username
     } else {
-      socket.emit("not_typing",username, room); // Send room information
+      
+        socket.emit("not_typing", username); // Notify that the user is not typing
     }
-          const lastTypingTime = new Date().getTime();
-    const timerLength = 3000;
-
-    setTimeout(() => {
-      const timeNow = new Date().getTime();
-      const timeDiff = timeNow - lastTypingTime;
-
-      if(timeDiff >= timerLength && typingUsers){
-        socket.emit("not_typing",username);
-        setIsTyping(false)
-      }
-    },timerLength);
   };
+  
+
 
     const joinRoom = () => {
         if ( room !== "") {
@@ -225,10 +212,13 @@ const SocketProvider = ({children}: PropsWithChildren) => {
     });
   }, []);
   
+ 
+  
+
     const fetchGif = async ()=>  {
       try {
           
-          const giphyUrl = "https://api.giphy.com/v1/gifs/random?api_key=lwMa3B9QFK1Z9GZRQu1iZkhRWkiQoZXp&tag=&rating=g";
+          const giphyUrl = `https://api.giphy.com/v1/gifs/random?api_key=${import.meta.env.VITE_API_KEY}&tag=&rating=g`;
           const response = await fetch(giphyUrl);
           const data = await response.json();
           const gifUrl = data.data.images.downsized.url;
