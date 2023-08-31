@@ -42,19 +42,19 @@ io.on("connection", (socket) => {
           console.log("från join",activeRooms);     
     })
 
-  socket.on("send_message", (data) => {
-    socket.to(data.room).emit("receive_message", data);
-    console.log(data);
-  });
+    socket.on("send_message", (data) => {
+      socket.to(data.room).emit("receive_message", {
+        ...data,
+        isTyping: false, // By default, set isTyping to false
+      });
+    });
+    
+    socket.on("typing_status", (data) => {
+      socket.to(data.room).emit("receive_typing_status", data);
+    });
+    
+    
 
-  socket.on("typing", (username) => {
-    socket.to(socket.currentRoom).emit("typing", username); 
-  });
-
-  socket.on("not_typing", (username) => {
-  socket.to(socket.currentRoom).emit("not_typing", username); 
-
-  });
   
   socket.on("leave_room", () => {
     if (socket.currentRoom && socket.currentRoom !== "lobby") { //kollar om användare är i ett rum - om och om rummet som lämnas inte är lobbyn

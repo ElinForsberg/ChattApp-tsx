@@ -12,10 +12,9 @@ function Chat() {
     username, 
     sendMessage, 
     setCurrentRoom,
-    isTyping,
-    typingUsers,
     handleInput,
     roomsList,
+    typingUsers,
     userList,
     setMessageList, 
     } = useSocket()
@@ -33,7 +32,8 @@ function Chat() {
    
             <button className="chatBtn" onClick={leaveRoom}>Tillbaka till lobbyn</button><br />
             <p className='active-rooms-list'>Alla aktiva rum: </p>
-          
+      
+
 
         <ul className="roomsList">
   {roomsList.map((activeRoom) => (
@@ -70,19 +70,14 @@ function Chat() {
         <p>Live Chat</p>
         </div> 
         <div className="chat-body">
-
+    {/* Display typing users */}
+    {typingUsers.length > 0 && (
+  <p className="typing-indicator">
+    {typingUsers.join(", ")} {typingUsers.length > 1 ? "are" : "is"} typing...
+  </p>
+)}
 
               <div className="message-container">
-
-              <div className="feedback">
-                {isTyping && typingUsers.length > 0 && (
-                <p>
-                {typingUsers.join(", ")}{" "}
-                {typingUsers.length === 1 ? "skriver" : ""} ...
-                </p>
-                )}
-          </div>
-
 
           {messageList.map((messageContent, index) => {
             
