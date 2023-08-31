@@ -74,14 +74,13 @@ function Chat() {
 
               <div className="message-container">
 
-              <div className="feedback">
-                {isTyping && typingUsers.length > 0 && (
-                <p>
-                {typingUsers.join(", ")}{" "}
-                {typingUsers.length === 1 ? "skriver" : ""} ...
-                </p>
-                )}
-          </div>
+               <div className="feedback">
+            {isTyping && typingUsers && (
+            <p>
+            {typingUsers} skriver...
+            </p>
+            )}
+</div>
 
 
           {messageList.map((messageContent, index) => {
